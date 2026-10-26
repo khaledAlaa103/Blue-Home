@@ -1,0 +1,99 @@
+import { useEffect, useState } from 'react'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { api } from '../api'
+import { waLink } from '../format'
+
+const SiteContext = { current: null }
+export function useSite() {
+  return SiteContext.current
+}
+
+export function Logo() {
+  return (
+    <span className="logo">
+      <svg className="logo-mark" viewBox="0 0 38 38" aria-hidden="true">
+        <rect width="38" height="38" rx="12" fill="#10243e" />
+        <path d="M8 18 L19 9 L30 18 V29 H8Z" fill="none" stroke="white" strokeWidth="2" />
+        <path d="M16 29 V21 H22 V29" fill="none" stroke="#8eb6ef" strokeWidth="2" />
+      </svg>
+      <span>
+        <strong>بلو هوم</strong>
+        <small>BLUE HOME</small>
+      </span>
+    </span>
+  )
+}
+
+function Header({ open, setOpen }) {
+  return (
+    <header className="header">
+      <div className="container bar">
+        <Link to="/" className="logo-link" aria-label="بلو هوم"><Logo /></Link>
+        <button className="menu-btn" aria-expanded={open} aria-controls="site-nav" onClick={() => setOpen((value) => !value)}>القائمة</button>
+        <nav id="site-nav" className={open ? 'nav open' : 'nav'}>
+          <NavLink to="/" end>الرئيسية</NavLink>
+          <NavLink to="/projects">المشاريع</NavLink>
+          <NavLink to="/units">الوحدات</NavLink>
+          <NavLink to="/lands">الأراضي</NavLink>
+          <NavLink to="/about">من نحن</NavLink>
+          <NavLink to="/contact">تواصل معنا</NavLink>
+        </nav>
+      </div>
+    </header>
+  )
+}
+
+function Footer({ site }) {
+  const settings = site?.settings || {}
+  const year = new Date().getFullYear()
+  return (
+    <footer className="footer">
+      <div className="container footer-grid">
+        <div>
+          <Logo />
+          <p className="quiet">عرض الوحدات والمشاريع والأراضي كما يضيفها صاحب المنصة، في 6 أكتوبر والشيخ زايد وأكتوبر الجديدة.</p>
+        </div>
+        <div>
+          <strong>الصفحات</strong>
+          <Link to="/projects">المشاريع</Link>
+          <Link to="/units">الوحدات</Link>
+          <Link to="/lands">الأراضي</Link>
+          <Link to="/search">بحث متقدم</Link>
+        </div>
+        <div>
+          <strong>المناطق</strong>
+          {(site?.areas || []).map((area) => <Link key={area.id} to={`/search?areaId=${area.id}`}>{area.name}</Link>)}
+        </div>
+        <div>
+          <strong>التواصل</strong>
+          {settings.phone ? <a href={`tel:${settings.phone}`}>{settings.phone}</a> : <span className="quiet">الهاتف يُضاف من لوحة التحكم</span>}
+          {settings.email ? <a href={`mailto:${settings.email}`}>{settings.email}</a> : null}
+          {settings.address ? <span>{settings.address}</span> : null}
+          {settings.facebook ? <a href={settings.facebook} target="_blank" rel="noreferrer">فيسبوك</a> : null}
+          {settings.instagram ? <a href={settings.instagram} target="_blank" rel="noreferrer">إنستغرام</a> : null}
+          {settings.youtube ? <a href={settings.youtube} target="_blank" rel="noreferrer">يوتيوب</a> : null}
+          <Link to="/admin/login">لوحة التحكم</Link>
+        </div>
+      </div>
+      <div className="container legal">© {year} بلو هوم</div>
+    </footer>
+  )
+}
+
+export function PublicLayout() {
+  const [site, setSite] = useState(null)
+  const [open, setOpen] = useState(false)
+  const path = useLocation().pathname
+  SiteContext.current = site
+  useEffect(() => { setOpen(false); window.scrollTo(0, 0) }, [path])
+  useEffect(() => { api.bootstrap().then(setSite).catch(() => setSite(null)) }, [])
+  const whatsapp = site?.settings?.whatsapp
+  return (
+    <>
+      <Header open={open} setOpen={setOpen} />
+      <main><Outlet context={site} /></main>
+      <Footer site={site} />
+      {whatsapp ? <a className="wa-float" href={waLink(whatsapp, 'مرحباً، أود الاستفسار عن عروض بلو هوم.')} target="_blank" rel="noreferrer">واتساب</a> : null}
+    </>
+  )
+}

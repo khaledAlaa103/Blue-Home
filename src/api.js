@@ -1,0 +1,93 @@
+const TOKEN_KEY = 'bluehome_token'
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY)
+}
+
+export function setToken(token) {
+  if (token) localStorage.setItem(TOKEN_KEY, token)
+  else localStorage.removeItem(TOKEN_KEY)
+}
+
+async function request(path, { method = 'GET', body, form } = {}) {
+  const headers = {}
+  const token = getToken()
+  if (token) headers.Authorization = `Bearer ${token}`
+  let payload
+  if (form) payload = form
+  else if (body != null) {
+    headers['Content-Type'] = 'application/json'
+    payload = JSON.stringify(body)
+  }
+  let response
+  try {
+    response = await fetch(path, { method, headers, body: payload })
+  } catch {
+    const error = new Error('تعذر الاتصال بالخادم')
+    error.status = 0
+    throw error
+  }
+  const data = await response.json().catch(() => ({}))
+  if (response.status === 401 && !path.endsWith('/login')) setToken(null)
+  if (!response.ok) {
+    const error = new Error(data.error || 'حدث خطأ')
+    error.status = response.status
+    error.code = data.code
+    throw error
+  }
+  return data
+}
+
+function query(path, params) {
+  const search = new URLSearchParams()
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== '' && value != null) search.set(key, value)
+  })
+  const text = search.toString()
+  return request(text ? `${path}?${text}` : path)
+}
+
+export const api = {
+  login: (username, password) => request('/api/auth/login', { method: 'POST', body: { username, password } }),
+  me: async () => {
+    if (!getToken()) return null
+    try {
+      return await request('/api/auth/me')
+    } catch (error) {
+      if (error.status === 401) return null
+      throw error
+    }
+  },
+  changePassword: (current, next) => request('/api/auth/password', { method: 'POST', body: { current, next } }),
+  bootstrap: () => request('/api/bootstrap'),
+  home: () => request('/api/home'),
+  projects: (params) => query('/api/projects', params),
+  project: (id, preview) => request(`/api/projects/${id}${preview ? '?preview=1' : ''}`),
+  listings: (params) => query('/api/listings', params),
+  listing: (id, preview) => request(`/api/listings/${id}${preview ? '?preview=1' : ''}`),
+  similar: (id) => request(`/api/listings/${id}/similar`),
+  inquire: (body) => request('/api/inquiries', { method: 'POST', body }),
+  summary: () => request('/api/admin/summary'),
+  adminProjects: () => request('/api/admin/projects'),
+  saveProject: (body, id) => request(id ? `/api/admin/projects/${id}` : '/api/admin/projects', { method: id ? 'PUT' : 'POST', body }),
+  deleteProject: (id) => request(`/api/admin/projects/${id}`, { method: 'DELETE' }),
+  adminListings: () => request('/api/admin/listings'),
+  saveListing: (body, id) => request(id ? `/api/admin/listings/${id}` : '/api/admin/listings', { method: id ? 'PUT' : 'POST', body }),
+  deleteListing: (id) => request(`/api/admin/listings/${id}`, { method: 'DELETE' }),
+  adminAreas: () => request('/api/admin/areas'),
+  saveArea: (body, id) => request(id ? `/api/admin/areas/${id}` : '/api/admin/areas', { method: id ? 'PUT' : 'POST', body }),
+  deleteArea: (id) => request(`/api/admin/areas/${id}`, { method: 'DELETE' }),
+  inquiries: () => request('/api/admin/inquiries'),
+  markInquiry: (id, read) => request(`/api/admin/inquiries/${id}`, { method: 'PATCH', body: { read } }),
+  deleteInquiry: (id) => request(`/api/admin/inquiries/${id}`, { method: 'DELETE' }),
+  adminTestimonials: () => request('/api/admin/testimonials'),
+  saveTestimonial: (body, id) => request(id ? `/api/admin/testimonials/${id}` : '/api/admin/testimonials', { method: id ? 'PUT' : 'POST', body }),
+  deleteTestimonial: (id) => request(`/api/admin/testimonials/${id}`, { method: 'DELETE' }),
+  saveSettings: (body) => request('/api/admin/settings', { method: 'PUT', body }),
+  deleteSamples: () => request('/api/admin/sample-data/delete', { method: 'POST', body: {} }),
+  upload: (file) => {
+    const form = new FormData()
+    form.append('file', file)
+    return request('/api/admin/upload', { method: 'POST', form })
+  },
+}
