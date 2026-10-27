@@ -510,8 +510,28 @@ a.contact-row:hover { background: #f8faff; }
   box-shadow: 0 10px 24px rgba(18, 140, 126, 0.28);
 }
 
-.login-screen { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; }
-.login-panel { width: min(440px, 100%); background: white; border-radius: 24px; padding: 22px; border: 1px solid var(--line); box-shadow: var(--shadow); display: grid; gap: 12px; }
+/* Login / Sign up: a calm real-estate photo under a navy-to-blue wash, so the white card stays the focus. */
+.login-screen {
+  min-height: calc(100dvh - 78px);
+  display: grid;
+  place-items: center;
+  padding: 48px 16px;
+  background:
+    linear-gradient(135deg, rgba(14, 39, 68, 0.9) 0%, rgba(16, 36, 62, 0.76) 50%, rgba(24, 64, 170, 0.62) 100%),
+    url("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=70") center / cover no-repeat,
+    #0e2744;
+}
+.login-panel {
+  width: min(440px, 100%);
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 24px;
+  padding: 28px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 30px 70px rgba(8, 18, 32, 0.35);
+  display: grid;
+  gap: 12px;
+}
+.login-panel h1 { color: var(--navy); }
 
 .dash { min-height: 100dvh; }
 .dash-top {
@@ -704,6 +724,15 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .password-field input { padding-inline-end: 52px; }
   .password-toggle { width: 44px; height: 44px; }
   .field textarea { min-height: 120px; }
+  .login-screen {
+    min-height: calc(100dvh - 64px);
+    padding: 28px 14px calc(40px + env(safe-area-inset-bottom));
+    background:
+      linear-gradient(160deg, rgba(14, 39, 68, 0.9) 0%, rgba(16, 36, 62, 0.76) 55%, rgba(24, 64, 170, 0.62) 100%),
+      url("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=900&q=65") center / cover no-repeat,
+      #0e2744;
+  }
+  .login-panel { padding: 22px 18px; border-radius: 20px; }
   .search-card .btn, .contact-form .btn, .stack-form .btn, .login-panel .btn, .filters-foot .btn, .cta-row .btn {
     width: 100%;
     min-height: 48px;
@@ -750,8 +779,6 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .area-card strong { font-size: 1.25rem; }
   .footer { padding: 24px 0 calc(18px + env(safe-area-inset-bottom)); }
   .footer a { padding: 8px 0; font-size: 1rem; }
-  .login-screen { padding: 16px 14px calc(16px + env(safe-area-inset-bottom)); }
-  .login-panel { padding: 18px 16px; border-radius: 20px; }
   .dash-top { padding-inline: 12px; gap: 8px; }
   .pills a { min-height: 40px; display: inline-flex; align-items: center; }
   .bar-row { grid-template-columns: 1fr; }
