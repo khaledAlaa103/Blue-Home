@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api } from '../api'
-import { waLink } from '../format'
+import { contactNumbers, telLink, waLink } from '../format'
 import { AccountMenu } from './AccountMenu'
 import { PriceNotice } from './PriceGate'
 import { InstallPrompt } from './InstallPrompt'
@@ -49,6 +49,7 @@ function Header({ open, setOpen }) {
 
 function Footer({ site }) {
   const settings = site?.settings || {}
+  const { phone, whatsapp } = contactNumbers(settings)
   const year = new Date().getFullYear()
   return (
     <footer className="footer">
@@ -70,12 +71,14 @@ function Footer({ site }) {
         </div>
         <div>
           <strong>التواصل</strong>
-          {settings.phone ? <a href={`tel:${settings.phone}`}>{settings.phone}</a> : <span className="quiet">الهاتف يُضاف من حساب الأدمن</span>}
+          {phone ? <a href={telLink(phone)}>اتصال: <bdi dir="ltr">{phone}</bdi></a> : null}
+          {whatsapp ? <a href={waLink(whatsapp, 'مرحباً، أود الاستفسار عن عروض بلو هوم.')} target="_blank" rel="noreferrer">واتساب</a> : null}
           {settings.email ? <a href={`mailto:${settings.email}`}>{settings.email}</a> : null}
           {settings.address ? <span>{settings.address}</span> : null}
           {settings.facebook ? <a href={settings.facebook} target="_blank" rel="noreferrer">فيسبوك</a> : null}
           {settings.instagram ? <a href={settings.instagram} target="_blank" rel="noreferrer">إنستغرام</a> : null}
           {settings.youtube ? <a href={settings.youtube} target="_blank" rel="noreferrer">يوتيوب</a> : null}
+          <Link to="/contact">تواصل معنا</Link>
         </div>
       </div>
       <div className="container legal">© {year} بلو هوم</div>
@@ -94,7 +97,7 @@ export function PublicLayout() {
     document.body.classList.toggle('menu-lock', open)
     return () => document.body.classList.remove('menu-lock')
   }, [open])
-  const whatsapp = site?.settings?.whatsapp
+  const { whatsapp } = contactNumbers(site?.settings)
   return (
     <>
       <Header open={open} setOpen={setOpen} />

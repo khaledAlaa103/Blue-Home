@@ -408,6 +408,7 @@ button { cursor: pointer; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   min-height: 44px;
   padding: 0 16px;
   border-radius: 12px;
@@ -427,8 +428,12 @@ button { cursor: pointer; }
 .hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; opacity: 0; pointer-events: none; }
 
 .footer { background: white; border-top: 1px solid var(--line); padding: 28px 0 18px; margin-top: 20px; }
-.footer-grid { display: grid; gap: 18px; }
+.footer-grid { display: grid; gap: 22px; }
+.footer-grid > div { display: grid; align-content: start; gap: 2px; }
+.footer-grid > div > strong { display: block; color: var(--ink); margin-bottom: 6px; }
+.footer-grid > div > span { color: #475467; padding: 3px 0; }
 .footer a { display: block; color: #475467; padding: 3px 0; }
+.footer a:hover { color: var(--blue); }
 .legal { color: var(--muted); font-size: 0.85rem; margin-top: 18px; }
 .wa-float {
   position: fixed;

@@ -5,7 +5,7 @@ import { ListingCard } from '../components/Cards'
 import { Gallery } from '../components/Gallery'
 import { InquiryForm } from '../components/InquiryForm'
 import { Price } from '../components/PriceGate'
-import { directVideo, formatDate, formatNumber, formatPrice, mapEmbed, mapLink, operationLabel, paymentLabel, statusLabel, telLink, useTitle, videoEmbed, waLink } from '../format'
+import { contactNumbers, directVideo, formatDate, formatNumber, formatPrice, mapEmbed, mapLink, operationLabel, paymentLabel, statusLabel, telLink, useTitle, videoEmbed, waLink } from '../format'
 
 export default function PropertyDetail() {
   const { id } = useParams()
@@ -28,8 +28,7 @@ export default function PropertyDetail() {
 
   if (error) return <p className="container msg-err">{error}</p>
   if (!item) return <p className="container state">جارٍ التحميل…</p>
-  const phone = site?.settings?.phone
-  const whatsapp = site?.settings?.whatsapp
+  const { phone, whatsapp } = contactNumbers(site?.settings)
   const message = `مرحباً، أرغب في الاستفسار عن «${item.title}»${item.areaName ? ` في ${item.areaName}` : ''}`
   const rows = [
     ['النوع', item.type],

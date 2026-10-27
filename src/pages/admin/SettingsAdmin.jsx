@@ -43,7 +43,8 @@ export default function SettingsAdmin() {
         <Field label="اسم الموقع"><input value={form.siteName || ''} onChange={(event) => set('siteName', event.target.value)} /></Field>
         <Field label="الاسم بالإنجليزية"><input value={form.siteNameEn || ''} onChange={(event) => set('siteNameEn', event.target.value)} /></Field>
         <Field label="الهاتف"><input className="num" value={form.phone || ''} onChange={(event) => set('phone', event.target.value)} /></Field>
-        <Field label="واتساب"><input className="num" value={form.whatsapp || ''} onChange={(event) => set('whatsapp', event.target.value)} /></Field>
+        <Field label="واتساب (اختياري)"><input className="num" value={form.whatsapp || ''} onChange={(event) => set('whatsapp', event.target.value)} placeholder="فاضي = نفس رقم الهاتف" /></Field>
+        <p className="quiet wide">رقم الهاتف بيظهر للاتصال وللواتساب مع بعض. اكتب رقم واتساب بس لو عايزه مختلف عن الهاتف.</p>
         <Field label="البريد"><input value={form.email || ''} onChange={(event) => set('email', event.target.value)} /></Field>
         <Field label="العنوان"><input value={form.address || ''} onChange={(event) => set('address', event.target.value)} /></Field>
         <Field label="فيسبوك"><input value={form.facebook || ''} onChange={(event) => set('facebook', event.target.value)} placeholder="https://" /></Field>

@@ -38,6 +38,12 @@ export function waLink(raw, message) {
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`
 }
 
+// One number covers both: WhatsApp falls back to the phone when no separate WhatsApp number is set.
+export function contactNumbers(settings) {
+  const phone = settings?.phone || ''
+  return { phone, whatsapp: settings?.whatsapp || phone }
+}
+
 export function telLink(raw) {
   const digits = String(raw || '').replace(/[^\d+]/g, '')
   return digits ? `tel:${digits}` : ''
