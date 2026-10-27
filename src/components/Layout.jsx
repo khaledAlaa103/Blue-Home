@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api } from '../api'
 import { contactNumbers, telLink, waLink } from '../format'
 import { AccountMenu } from './AccountMenu'
-import { PriceNotice } from './PriceGate'
+import { PriceNotice, useSignedIn } from './PriceGate'
 import { InstallPrompt } from './InstallPrompt'
 
 const SiteContext = { current: null }
@@ -28,11 +28,14 @@ export function Logo() {
 }
 
 function Header({ open, setOpen }) {
+  const signedIn = useSignedIn()
   return (
     <header className="header">
       <div className="container topbar">
         <Link to="/" className="logo-link" aria-label="بلو هوم"><Logo /></Link>
-        <button className="menu-btn" aria-expanded={open} aria-controls="site-nav" onClick={() => setOpen((value) => !value)}>القائمة</button>
+        <button className="nav-toggle" type="button" aria-label={open ? 'إغلاق القائمة' : 'فتح القائمة'} aria-expanded={open} aria-controls="site-nav" onClick={() => setOpen((value) => !value)}>
+          <span className="nav-toggle-icon" aria-hidden="true"><span /><span /><span /></span>
+        </button>
         <nav id="site-nav" className={open ? 'nav open' : 'nav'}>
           <NavLink to="/" end>الرئيسية</NavLink>
           <NavLink to="/projects">المشاريع</NavLink>
@@ -40,6 +43,12 @@ function Header({ open, setOpen }) {
           <NavLink to="/lands">الأراضي</NavLink>
           <NavLink to="/about">من نحن</NavLink>
           <NavLink to="/contact">تواصل معنا</NavLink>
+          {signedIn ? null : (
+            <div className="nav-auth">
+              <Link className="btn btn-line" to="/login">Login</Link>
+              <Link className="btn btn-primary" to="/signup">Sign up</Link>
+            </div>
+          )}
         </nav>
         <AccountMenu />
       </div>
