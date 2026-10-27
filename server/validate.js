@@ -49,6 +49,15 @@ function httpsOrEmpty(value, label) {
   return { value: clean }
 }
 
+export const VIDEO_PATH = /^\/uploads\/videos\/[a-f0-9]{16}\.(mp4|mov|webm|m4v)$/
+
+// Either a link (YouTube, mp4) or a video the admin uploaded to /uploads/videos/.
+function videoOrEmpty(value, label) {
+  const clean = text(value, 400)
+  if (VIDEO_PATH.test(clean)) return { value: clean }
+  return httpsOrEmpty(clean, label)
+}
+
 function featuresOf(value) {
   const list = Array.isArray(value) ? value : String(value || '').split('\n')
   return list.map((item) => text(item, 80)).filter(Boolean).slice(0, 30)
@@ -106,7 +115,7 @@ export function parseProject(body, db, current) {
   if ((lat.value == null) !== (lng.value == null)) return fail('أدخل خطي الطول والعرض معًا أو اتركهما فارغين')
   const images = imagesOf(merged.images)
   if (images.error) return images
-  const videoUrl = httpsOrEmpty(merged.videoUrl, 'رابط الفيديو')
+  const videoUrl = videoOrEmpty(merged.videoUrl, 'رابط الفيديو')
   if (videoUrl.error) return videoUrl
   const tour = httpsOrEmpty(merged.virtualTourUrl, 'رابط الجولة')
   if (tour.error) return tour
@@ -188,7 +197,7 @@ export function parseListing(body, db, current) {
   if ((lat.value == null) !== (lng.value == null)) return fail('أدخل خطي الطول والعرض معًا أو اتركهما فارغين')
   const images = imagesOf(merged.images)
   if (images.error) return images
-  const videoUrl = httpsOrEmpty(merged.videoUrl, 'رابط الفيديو')
+  const videoUrl = videoOrEmpty(merged.videoUrl, 'رابط الفيديو')
   if (videoUrl.error) return videoUrl
   const tour = httpsOrEmpty(merged.virtualTourUrl, 'رابط الجولة')
   if (tour.error) return tour

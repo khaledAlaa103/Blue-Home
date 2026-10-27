@@ -67,6 +67,7 @@ export function videoEmbed(url) {
 
 export function directVideo(url) {
   if (!url) return ''
+  if (/^\/uploads\/videos\/[a-f0-9]{16}\.(mp4|mov|webm|m4v)$/.test(url)) return url
   try {
     const parsed = new URL(url)
     if (parsed.protocol === 'https:' && parsed.pathname.toLowerCase().endsWith('.mp4')) return parsed.href

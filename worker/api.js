@@ -11,6 +11,7 @@ import {
 import { applyFilters, paginate, similarTo } from '../server/filter.js'
 import { parseProject, parseListing, parseArea, parseSettings, parseTestimonial, parseInquiry } from '../server/validate.js'
 import { accountExpired, customerRows, enforceCustomerLimits, isCurrent, RETENTION_YEARS, signupCount, USER_LIMIT } from '../server/customers.js'
+import { VIDEO_TYPES, videoUploadError } from '../server/video.js'
 
 const attempts = new Map()
 const encoder = new TextEncoder()
@@ -135,7 +136,19 @@ async function bodyOf(request) {
   }
 }
 
-export async function handleApi(request) {
+// The raw file is the request body, streamed straight into R2 so big videos never sit in memory.
+async function uploadVideo(request, media) {
+  if (!media) return json({ error: 'تخزين الفيديو مش متفعّل على السيرفر لسه' }, 503)
+  const type = (request.headers.get('content-type') || '').split(';')[0].trim().toLowerCase()
+  const size = Number(request.headers.get('content-length'))
+  const problem = videoUploadError(type, size)
+  if (problem) return json({ error: problem }, problem.includes('حجم') ? 413 : 400)
+  const key = `videos/${randomId()}.${VIDEO_TYPES[type]}`
+  await media.put(key, request.body, { httpMetadata: { contentType: type } })
+  return json({ url: `/uploads/${key}` })
+}
+
+export async function handleApi(request, env = {}) {
   const url = new URL(request.url)
   const query = queryOf(url)
   const user = await readUser(request).catch(() => null)
@@ -147,6 +160,8 @@ export async function handleApi(request) {
   } else if ((url.pathname === '/api/auth/me' || url.pathname === '/api/auth/password') && !user) {
     return json({ error: 'يلزم تسجيل الدخول' }, 401)
   }
+
+  if (request.method === 'POST' && url.pathname === '/api/admin/upload-video') return uploadVideo(request, env.MEDIA)
 
   const route = [
     ['GET', '/api/health'],

@@ -36,7 +36,7 @@ export default function ProjectDetail() {
           {project.description ? <section className="section"><h2>عن المشروع</h2><p>{project.description}</p></section> : null}
           {project.features?.length ? <ul className="feature-list">{project.features.map((item) => <li key={item}>{item}</li>)}</ul> : null}
           {embed ? <iframe className="video" src={embed} title="فيديو المشروع" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /> : null}
-          {file ? <video className="video" src={file} controls /> : null}
+          {file ? <video className="video" src={file} controls playsInline preload="metadata" /> : null}
           {project.virtualTourUrl ? <p><a className="btn btn-line" href={project.virtualTourUrl} target="_blank" rel="noreferrer">الجولة الافتراضية</a></p> : null}
           {map ? (
             <section>

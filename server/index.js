@@ -10,6 +10,7 @@ import { ensureDb, readDb, mutate, enrichListing, enrichProject, publicSettings,
 import { applyFilters, paginate, similarTo } from './filter.js'
 import { parseProject, parseListing, parseArea, parseSettings, parseTestimonial, parseInquiry } from './validate.js'
 import { accountExpired, customerRows, enforceCustomerLimits, isCurrent, RETENTION_YEARS, signupCount, USER_LIMIT } from './customers.js'
+import { VIDEO_MAX_BYTES, VIDEO_TYPES, videoUploadError } from './video.js'
 
 const __dirname = (() => {
   try {
@@ -536,6 +537,31 @@ app.post('/api/admin/upload', auth, (req, res, next) => {
       return res.json({ url: `data:${mime};base64,${req.file.buffer.toString('base64')}` })
     }
     res.json({ url: `/uploads/${req.file.filename}` })
+  })
+})
+
+// The raw file is the request body; stream it to disk under uploads/videos/.
+app.post('/api/admin/upload-video', auth, (req, res) => {
+  if (isCloud()) return res.status(503).json({ error: 'تخزين الفيديو مش متفعّل على السيرفر لسه' })
+  const type = String(req.headers['content-type'] || '').split(';')[0].trim().toLowerCase()
+  const size = Number(req.headers['content-length'])
+  const problem = videoUploadError(type, size)
+  if (problem) return res.status(problem.includes('حجم') ? 413 : 400).json({ error: problem })
+  const dir = path.join(uploadDir, 'videos')
+  fs.mkdirSync(dir, { recursive: true })
+  const name = `${crypto.randomBytes(8).toString('hex')}.${VIDEO_TYPES[type]}`
+  const target = path.join(dir, name)
+  const out = fs.createWriteStream(target)
+  let received = 0
+  req.on('data', (chunk) => {
+    received += chunk.length
+    if (received > VIDEO_MAX_BYTES) req.destroy()
+  })
+  req.pipe(out)
+  out.on('finish', () => res.json({ url: `/uploads/videos/${name}` }))
+  req.on('error', () => {
+    out.destroy()
+    fs.rmSync(target, { force: true })
   })
 })
 

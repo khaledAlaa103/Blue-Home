@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api'
 import { useTitle } from '../../format'
-import { Field, ImagesField } from './ui'
+import { Field, ImagesField, VideoField } from './ui'
 
 const empty = { name: '', developer: '', areaId: '', address: '', description: '', featuresText: '', lat: '', lng: '', videoUrl: '', virtualTourUrl: '', images: [], published: true, featured: false, isSample: false }
 
@@ -51,7 +51,7 @@ export default function ProjectsAdmin() {
         <Field label="المميزات، سطر لكل ميزة" wide><textarea value={form.featuresText || ''} onChange={(event) => set('featuresText', event.target.value)} /></Field>
         <Field label="خط العرض"><input className="num" value={form.lat} onChange={(event) => set('lat', event.target.value)} /></Field>
         <Field label="خط الطول"><input className="num" value={form.lng} onChange={(event) => set('lng', event.target.value)} /></Field>
-        <Field label="رابط فيديو https"><input value={form.videoUrl || ''} onChange={(event) => set('videoUrl', event.target.value)} /></Field>
+        <VideoField value={form.videoUrl || ''} onChange={(url) => set('videoUrl', url)} />
         <Field label="رابط جولة افتراضية"><input value={form.virtualTourUrl || ''} onChange={(event) => set('virtualTourUrl', event.target.value)} /></Field>
         <ImagesField images={form.images || []} onChange={(images) => set('images', images)} />
         <label className="check"><input type="checkbox" checked={form.published} onChange={(event) => set('published', event.target.checked)} /> ظاهر في الموقع</label>

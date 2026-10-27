@@ -98,4 +98,25 @@ export const api = {
     form.append('file', file)
     return request('/api/admin/upload', { method: 'POST', form })
   },
+  // XHR rather than fetch: fetch can't report upload progress, and videos take a while on mobile data.
+  uploadVideo: (file, onProgress) => new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', '/api/admin/upload-video')
+    const token = getToken()
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+    xhr.setRequestHeader('Content-Type', file.type || 'video/mp4')
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) onProgress?.(Math.round((event.loaded / event.total) * 100))
+    }
+    xhr.onload = () => {
+      let data = {}
+      try { data = JSON.parse(xhr.responseText) } catch { /* not json */ }
+      if (xhr.status >= 200 && xhr.status < 300) return resolve(data)
+      const error = new Error(data.error || (xhr.status === 413 ? 'حجم الفيديو كبير' : 'تعذر رفع الفيديو'))
+      error.status = xhr.status
+      reject(error)
+    }
+    xhr.onerror = () => reject(new Error('تعذر الاتصال بالخادم'))
+    xhr.send(file)
+  }),
 }

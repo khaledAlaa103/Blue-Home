@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../../api'
 import { formatPrice, statusLabel, useTitle } from '../../format'
 import { OPERATIONS, PAYMENTS, PROPERTY_TYPES, ROOM_TYPES, STATUSES } from '../../../shared/constants.js'
-import { emptyToNull, Field, ImagesField } from './ui'
+import { emptyToNull, Field, ImagesField, VideoField } from './ui'
 
 const empty = { title: '', description: '', type: 'شقة', operation: 'sale', areaId: '', projectId: '', address: '', price: '', areaSqm: '', rooms: '', baths: '', paymentType: 'cash', downPayment: '', installmentAmount: '', installmentMonths: '', paymentNote: '', status: 'available', lat: '', lng: '', videoUrl: '', virtualTourUrl: '', featuresText: '', images: [], published: true, featured: false, isOffer: false, isSample: false }
 
@@ -93,7 +93,7 @@ export default function ListingsAdmin() {
         <Field label="ملاحظة السداد"><input value={form.paymentNote || ''} onChange={(event) => set('paymentNote', event.target.value)} /></Field>
         <Field label="خط العرض"><input className="num" value={form.lat} onChange={(event) => set('lat', event.target.value)} /></Field>
         <Field label="خط الطول"><input className="num" value={form.lng} onChange={(event) => set('lng', event.target.value)} /></Field>
-        <Field label="فيديو https"><input value={form.videoUrl || ''} onChange={(event) => set('videoUrl', event.target.value)} /></Field>
+        <VideoField value={form.videoUrl || ''} onChange={(url) => set('videoUrl', url)} />
         <Field label="جولة افتراضية"><input value={form.virtualTourUrl || ''} onChange={(event) => set('virtualTourUrl', event.target.value)} /></Field>
         <Field label="المميزات، سطر لكل ميزة" wide><textarea value={form.featuresText || ''} onChange={(event) => set('featuresText', event.target.value)} /></Field>
         <ImagesField images={form.images || []} onChange={(images) => set('images', images)} />
