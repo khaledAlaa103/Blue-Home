@@ -106,7 +106,6 @@ export default function Home() {
         <div className="look-grid">
           {LOOKING.map(([label, value]) => (
             <Link key={label} className="look" to={value === 'offers' ? '/search?offers=1' : value === 'أرض' ? '/lands' : `/search?type=${encodeURIComponent(value)}`}>
-              <i>{label.slice(0, 1)}</i>
               <span>{label}</span>
             </Link>
           ))}

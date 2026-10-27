@@ -201,24 +201,15 @@ button { cursor: pointer; }
   background: white;
   border: 1px solid var(--line);
   border-radius: 18px;
-  min-height: 108px;
+  min-height: 72px;
   padding: 16px;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.05rem;
   font-weight: 700;
   box-shadow: 0 8px 20px rgba(16, 36, 62, 0.03);
-}
-.look i {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: var(--soft);
-  color: var(--blue);
-  font-style: normal;
-  font-weight: 800;
 }
 .look:hover { border-color: #c9d7f5; }
 
@@ -665,7 +656,7 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
     font-weight: 800;
   }
   .look-grid { gap: 10px; }
-  .look { min-height: 96px; padding: 14px 12px; font-size: 1rem; border-radius: 16px; }
+  .look { min-height: 64px; padding: 14px 12px; font-size: 1rem; border-radius: 16px; }
   .look:active { background: #f3f6ff; }
   .card h3 { font-size: 1.12rem; }
   .card-body { padding: 16px; gap: 6px; }
