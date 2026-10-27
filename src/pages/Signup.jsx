@@ -40,7 +40,7 @@ export default function Signup() {
     <main className="login-screen">
       <form className="login-panel" onSubmit={submit}>
         <h1>Sign up</h1>
-        <p className="quiet">أنشئ حسابًا جديدًا على بلو هوم. الحساب يبقى لمدة سنتين، وعند اكتمال 10000 حساب يتحذف الأقدم ويُقبل الحساب الجديد.</p>
+        <p className="quiet">أنشئ حسابًا جديدًا على بلو هوم.</p>
         <label className="field"><span>الاسم الأول</span><input value={form.firstName} onChange={set('firstName')} autoComplete="given-name" required /></label>
         <label className="field"><span>الاسم الثاني</span><input value={form.lastName} onChange={set('lastName')} autoComplete="family-name" required /></label>
         <label className="field"><span>رقم التليفون</span><input value={form.phone} onChange={set('phone')} autoComplete="tel" inputMode="tel" required /></label>

@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "static-test",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "preview", "--host", "127.0.0.1", "--port", "4174", "--strictPort", "--outDir", "C:/Users/HP/AppData/Local/Temp/claude/D--blue-Home/053e4956-984a-40d1-8250-f7fa56993c8f/scratchpad/static-dist"],
+      "port": 4174
+    },
+    {
       "name": "preview-build",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["vite", "preview", "--host", "127.0.0.1", "--port", "4173", "--strictPort"],
