@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { api } from '../api'
-import { REQUEST_TYPES } from '../../shared/constants.js'
+import { REQUEST_TYPES, latinDigits } from '../../shared/constants.js'
 
 export function InquiryForm({ listingId = '', projectId = '', allowViewing = true }) {
   const options = REQUEST_TYPES.filter((item) => allowViewing || item.id !== 'viewing')
@@ -29,7 +29,7 @@ export function InquiryForm({ listingId = '', projectId = '', allowViewing = tru
     <form className="contact-form" onSubmit={submit}>
       <div className="hp" aria-hidden="true"><input tabIndex={-1} autoComplete="off" value={form.company} onChange={(event) => setForm({ ...form, company: event.target.value })} /></div>
       <label className="field"><span>الاسم</span><input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} required /></label>
-      <label className="field"><span>الموبايل</span><input className="num" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} required /></label>
+      <label className="field"><span>الموبايل</span><input className="num" value={form.phone} onChange={(event) => setForm({ ...form, phone: latinDigits(event.target.value) })} inputMode="tel" autoComplete="tel" required /></label>
       <label className="field"><span>نوع الطلب</span>
         <select value={form.requestType} onChange={(event) => setForm({ ...form, requestType: event.target.value })}>
           {options.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}

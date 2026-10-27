@@ -30,3 +30,10 @@ export const REQUEST_TYPES = [
 export function labelOf(list, id) {
   return list.find((item) => item.id === id)?.label || ''
 }
+
+// Phones typed on Arabic keyboards come as ٠١٢… (or Persian ۰۱۲…); validation and links need 0-9.
+export function latinDigits(value) {
+  return String(value ?? '')
+    .replace(/[٠-٩]/g, (digit) => String(digit.charCodeAt(0) - 0x0660))
+    .replace(/[۰-۹]/g, (digit) => String(digit.charCodeAt(0) - 0x06F0))
+}

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { api, setToken } from '../api'
 import { PasswordInput } from '../components/PasswordInput'
 import { useTitle } from '../format'
+import { latinDigits } from '../../shared/constants.js'
 
 const EMPTY = { firstName: '', lastName: '', phone: '', username: '', password: '', confirmPassword: '', address: '' }
 
@@ -43,7 +44,7 @@ export default function Signup() {
         <p className="quiet">أنشئ حسابًا جديدًا على بلو هوم.</p>
         <label className="field"><span>الاسم الأول</span><input value={form.firstName} onChange={set('firstName')} autoComplete="given-name" required /></label>
         <label className="field"><span>الاسم الثاني</span><input value={form.lastName} onChange={set('lastName')} autoComplete="family-name" required /></label>
-        <label className="field"><span>رقم التليفون</span><input value={form.phone} onChange={set('phone')} autoComplete="tel" inputMode="tel" required /></label>
+        <label className="field"><span>رقم التليفون</span><input value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: latinDigits(event.target.value) }))} autoComplete="tel" inputMode="tel" required /></label>
         <label className="field"><span>Username</span><input value={form.username} onChange={set('username')} autoComplete="username" required /></label>
         <label className="field"><span>Password</span><PasswordInput value={form.password} onChange={set('password')} autoComplete="new-password" required /></label>
         <label className="field"><span>Confirm password</span><PasswordInput value={form.confirmPassword} onChange={set('confirmPassword')} autoComplete="new-password" required /></label>

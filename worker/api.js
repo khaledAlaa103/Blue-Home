@@ -12,6 +12,7 @@ import { applyFilters, paginate, similarTo } from '../server/filter.js'
 import { parseProject, parseListing, parseArea, parseSettings, parseTestimonial, parseInquiry } from '../server/validate.js'
 import { accountExpired, customerRows, enforceCustomerLimits, isCurrent, RETENTION_YEARS, signupCount, USER_LIMIT } from '../server/customers.js'
 import { VIDEO_TYPES, videoUploadError } from '../server/video.js'
+import { latinDigits } from '../shared/constants.js'
 
 const attempts = new Map()
 const encoder = new TextEncoder()
@@ -237,7 +238,7 @@ export async function handleApi(request, env = {}) {
   if (route[1] === '/api/auth/register') {
     const firstName = String(body.firstName || '').trim()
     const lastName = String(body.lastName || '').trim()
-    const phone = String(body.phone || '').trim()
+    const phone = latinDigits(body.phone).trim()
     const username = String(body.username || '').trim()
     const password = String(body.password || '')
     const confirmPassword = String(body.confirmPassword || '')

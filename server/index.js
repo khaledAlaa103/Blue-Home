@@ -11,6 +11,7 @@ import { applyFilters, paginate, similarTo } from './filter.js'
 import { parseProject, parseListing, parseArea, parseSettings, parseTestimonial, parseInquiry } from './validate.js'
 import { accountExpired, customerRows, enforceCustomerLimits, isCurrent, RETENTION_YEARS, signupCount, USER_LIMIT } from './customers.js'
 import { VIDEO_MAX_BYTES, VIDEO_TYPES, videoUploadError } from './video.js'
+import { latinDigits } from '../shared/constants.js'
 
 const __dirname = (() => {
   try {
@@ -137,7 +138,7 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/auth/register', (req, res) => {
   const firstName = String(req.body?.firstName || '').trim()
   const lastName = String(req.body?.lastName || '').trim()
-  const phone = String(req.body?.phone || '').trim()
+  const phone = latinDigits(req.body?.phone).trim()
   const username = String(req.body?.username || '').trim()
   const password = String(req.body?.password || '')
   const confirmPassword = String(req.body?.confirmPassword || '')

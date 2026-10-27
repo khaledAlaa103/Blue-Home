@@ -1,4 +1,4 @@
-import { PROPERTY_TYPES, ROOM_TYPES, OPERATIONS, PAYMENTS, STATUSES, REQUEST_TYPES } from '../shared/constants.js'
+import { PROPERTY_TYPES, ROOM_TYPES, OPERATIONS, PAYMENTS, STATUSES, REQUEST_TYPES, latinDigits } from '../shared/constants.js'
 
 const ROOM = new Set(ROOM_TYPES)
 const OPS = new Set(OPERATIONS.map((item) => item.id))
@@ -261,7 +261,7 @@ function emailOrEmpty(value) {
 }
 
 function phoneOrEmpty(value, label) {
-  const clean = text(value, 30)
+  const clean = text(latinDigits(value), 30)
   if (!clean) return { value: '' }
   const digits = clean.replace(/\D/g, '')
   if (digits.length < 8 || digits.length > 15) return fail(`${label} غير صالح`)
