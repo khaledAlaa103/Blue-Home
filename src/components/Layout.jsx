@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api } from '../api'
-import { contactNumbers, telLink, waLink } from '../format'
+import { arabicList, contactNumbers, telLink, waLink } from '../format'
 import { AccountMenu } from './AccountMenu'
 import { PriceNotice, useSignedIn } from './PriceGate'
 import { InstallPrompt } from './InstallPrompt'
@@ -59,13 +59,14 @@ function Header({ open, setOpen }) {
 function Footer({ site }) {
   const settings = site?.settings || {}
   const { phone, whatsapp } = contactNumbers(settings)
+  const areaNames = arabicList((site?.areas || []).map((area) => area.name))
   const year = new Date().getFullYear()
   return (
     <footer className="footer">
       <div className="container footer-grid">
         <div>
           <Logo />
-          <p className="quiet">عرض الوحدات والمشاريع والأراضي</p>
+          <p className="quiet">عرض الوحدات والمشاريع والأراضي{areaNames ? ` في ${areaNames}` : ''}</p>
         </div>
         <div>
           <strong>الصفحات</strong>
