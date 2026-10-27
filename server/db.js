@@ -3,13 +3,50 @@ import path from 'path'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { fileURLToPath } from 'url'
+import { enforceCustomerLimits } from './customers.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-export const dbFile = path.join(__dirname, 'data.json')
-export const uploadDir = path.join(__dirname, 'uploads')
+const __dirname = (() => {
+  try {
+    return import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : '/tmp'
+  } catch {
+    return '/tmp'
+  }
+})()
+const writableRoot = process.env.VERCEL ? '/tmp' : __dirname
+export const dbFile = path.join(writableRoot, process.env.VERCEL ? 'blue-home-data.json' : 'data.json')
+export const uploadDir = path.join(writableRoot, process.env.VERCEL ? 'blue-home-uploads' : 'uploads')
 
 const ADMIN_USERNAME = 'admin'
-const ADMIN_PASSWORD = 'MaiBlue'
+
+function adminPassword() {
+  if (process.env.ADMIN_PASSWORD) return process.env.ADMIN_PASSWORD
+  if (isCloud()) return ''
+  return 'MaiBlue'
+}
+
+export function isCloud() {
+  return process.env.BLUE_HOME_CLOUD === '1' || typeof WebSocketPair !== 'undefined'
+}
+
+export function hashPassword(password) {
+  if (isCloud()) {
+    return `sha256:${crypto.createHash('sha256').update(`blue-home|${password}`).digest('hex')}`
+  }
+  return bcrypt.hashSync(password, 10)
+}
+
+export function passwordMatches(hash, password) {
+  const stored = String(hash || '')
+  if (!stored) return false
+  if (stored.startsWith('sha256:')) {
+    return stored === `sha256:${crypto.createHash('sha256').update(`blue-home|${password}`).digest('hex')}`
+  }
+  try {
+    return bcrypt.compareSync(password, stored)
+  } catch {
+    return false
+  }
+}
 
 const photos = {
   villa: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=70',
@@ -110,7 +147,12 @@ function createSeed() {
       {
         id: 'admin',
         username: ADMIN_USERNAME,
-        passwordHash: bcrypt.hashSync(ADMIN_PASSWORD, 10),
+        passwordHash: adminPassword() ? hashPassword(adminPassword()) : 'sha256:disabled',
+        role: 'admin',
+        firstName: '',
+        lastName: '',
+        phone: '',
+        address: '',
         mustChangePassword: false,
       },
     ],
@@ -165,27 +207,69 @@ function listing(partial) {
   }
 }
 
+let memoryDb = null
+let kvBinding = null
+let pendingWrite = null
+
+export function bindKv(binding) {
+  kvBinding = binding || null
+}
+
+export async function hydrateFromKv() {
+  if (!isCloud()) return
+  if (!kvBinding) {
+    if (!memoryDb) memoryDb = createSeed()
+    return
+  }
+  const text = await kvBinding.get('blue-home-db')
+  if (text) {
+    memoryDb = JSON.parse(text)
+    return
+  }
+  if (!memoryDb) memoryDb = createSeed()
+  await kvBinding.put('blue-home-db', JSON.stringify(memoryDb))
+}
+
 export function ensureDb() {
+  if (isCloud()) {
+    if (!memoryDb) memoryDb = createSeed()
+    return
+  }
   fs.mkdirSync(uploadDir, { recursive: true })
   if (!fs.existsSync(dbFile)) writeDb(createSeed())
 }
 
 export function readDb() {
+  if (isCloud()) {
+    if (!memoryDb) memoryDb = createSeed()
+    return memoryDb
+  }
   ensureDb()
   return JSON.parse(fs.readFileSync(dbFile, 'utf8'))
 }
 
 export function writeDb(db) {
+  if (isCloud()) {
+    memoryDb = db
+    if (kvBinding) pendingWrite = kvBinding.put('blue-home-db', JSON.stringify(db))
+    return
+  }
   fs.mkdirSync(uploadDir, { recursive: true })
   fs.writeFileSync(dbFile, JSON.stringify(db, null, 2))
 }
 
 let queue = Promise.resolve()
 export function mutate(fn) {
-  const run = queue.then(() => {
+  const run = queue.then(async () => {
     const db = readDb()
-    const result = fn(db)
+    const result = await fn(db)
+    enforceCustomerLimits(db)
     writeDb(db)
+    if (pendingWrite) {
+      const write = pendingWrite
+      pendingWrite = null
+      await write
+    }
     return result
   })
   queue = run.then(() => undefined, () => undefined)
@@ -228,6 +312,7 @@ export function publicSettings(settings) {
 }
 
 export function forgetImages(db, images) {
+  if (isCloud()) return
   for (const url of images || []) {
     if (!String(url).startsWith('/uploads/')) continue
     const used = [...db.projects, ...db.listings].some((item) => (item.images || []).includes(url))

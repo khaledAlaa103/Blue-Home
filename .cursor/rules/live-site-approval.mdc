@@ -1,0 +1,13 @@
+---
+description: Do not change the live Blue Home site unless the owner explicitly asks
+alwaysApply: true
+---
+
+# Live site changes
+
+The owner must know before anything on the live website changes.
+
+- Do not deploy, publish, or edit production data, Cloudflare settings, admin accounts, or DNS unless the owner explicitly asks for that change in the current request.
+- Do not put the admin password in source code, public pages, Git, or chat logs that get committed.
+- Do not create another admin account. Public signup always stays a normal user.
+- Reading the repository is not permission to change the published site.

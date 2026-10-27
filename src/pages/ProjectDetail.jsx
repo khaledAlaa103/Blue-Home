@@ -30,7 +30,6 @@ export default function ProjectDetail() {
         <h1>{project.name}</h1>
         <p className="quiet">{project.areaName}{project.developer ? ` · ${project.developer}` : ''}</p>
       </header>
-      {project.isSample ? <p className="sample-banner">هذا مشروع تجريبي للعرض داخل المنصة، وبياناته وأسعاره غير حقيقية.</p> : null}
       <div className="detail">
         <div className="detail-main">
           <Gallery images={project.images || []} title={project.name} />
@@ -42,7 +41,6 @@ export default function ProjectDetail() {
           {map ? (
             <section>
               <h2>الموقع</h2>
-              {project.isSample ? <p className="quiet">الإحداثيات تجريبية على مستوى المنطقة، وليست موقعًا مؤكدًا.</p> : null}
               <iframe className="video" title="خريطة المشروع" src={map} />
               <a href={mapLink(project.lat, project.lng)} target="_blank" rel="noreferrer">فتح الخريطة</a>
             </section>

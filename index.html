@@ -4,21 +4,65 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0e2744" />
+    <meta name="robots" content="index, follow" />
     <meta
       name="description"
-      content="بلو هوم منصة لعرض وبيع الوحدات السكنية والمشاريع والأراضي في 6 أكتوبر والشيخ زايد وأكتوبر الجديدة."
+      content="بلو هوم منصة لعرض وبيع الشقق والفلل والتاون هاوس والتوين هاوس والأراضي في 6 أكتوبر والشيخ زايد وأكتوبر الجديدة."
     />
+    <link rel="canonical" href="https://bluehome7.store/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ar_EG" />
+    <meta property="og:site_name" content="بلو هوم" />
+    <meta property="og:title" content="بلو هوم | Blue Home" />
+    <meta property="og:description" content="شقق وفلل وتاون هاوس وأراضٍ للبيع والاستثمار في 6 أكتوبر والشيخ زايد وأكتوبر الجديدة." />
+    <meta property="og:url" content="https://bluehome7.store/" />
     <title>بلو هوم | Blue Home</title>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="%BASE_URL%favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="%BASE_URL%icons/icon-180.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="بلو هوم" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;600;700&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;600;700&display=swap"
+      />
+    </noscript>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "RealEstateAgent",
+        "name": "بلو هوم",
+        "alternateName": "Blue Home",
+        "url": "https://bluehome7.store/",
+        "areaServed": ["6 أكتوبر", "الشيخ زايد", "أكتوبر الجديدة"],
+        "address": { "@type": "PostalAddress", "addressCountry": "EG" }
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main style="max-width: 720px; margin: 24px auto; padding: 0 16px; font-family: Tahoma, Arial, sans-serif">
+        <h1>بلو هوم | Blue Home</h1>
+        <p>شقق، فلل، تاون هاوس، توين هاوس، وأراضٍ في 6 أكتوبر والشيخ زايد وأكتوبر الجديدة.</p>
+        <p>
+          <a href="/projects">المشاريع</a>
+          · <a href="/units">الوحدات</a>
+          · <a href="/lands">الأراضي</a>
+          · <a href="/contact">تواصل معنا</a>
+        </p>
+      </main>
+    </div>
     <noscript>تشغيل JavaScript مطلوب لعرض بلو هوم.</noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>

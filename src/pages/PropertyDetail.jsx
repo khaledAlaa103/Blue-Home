@@ -57,7 +57,6 @@ export default function PropertyDetail() {
         <h1>{item.title}</h1>
         <p className="quiet">{item.type} · {item.areaName}</p>
       </header>
-      {item.isSample ? <p className="sample-banner">هذا الإعلان تجريبي لتجربة المنصة. السعر والمساحة ونظام السداد غير حقيقيين.</p> : null}
       <div className="detail">
         <div className="detail-main">
           <Gallery images={item.images || []} title={item.title} />
@@ -70,7 +69,6 @@ export default function PropertyDetail() {
           {map ? (
             <section className="section">
               <h2>الموقع</h2>
-              {item.isSample ? <p className="quiet">الإحداثيات تجريبية على مستوى المنطقة، وليست موقعًا مؤكدًا لعقار.</p> : null}
               <iframe className="video" title="خريطة العقار" src={map} />
               <a href={mapLink(item.lat, item.lng)} target="_blank" rel="noreferrer">فتح الخريطة</a>
             </section>

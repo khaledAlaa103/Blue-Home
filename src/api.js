@@ -10,6 +10,10 @@ export function setToken(token) {
 }
 
 async function request(path, { method = 'GET', body, form } = {}) {
+  if (import.meta.env.VITE_STATIC === '1') {
+    const { staticRequest } = await import('./staticApi.js')
+    return staticRequest(path, { method, body, form })
+  }
   const headers = {}
   const token = getToken()
   if (token) headers.Authorization = `Bearer ${token}`
@@ -49,6 +53,7 @@ function query(path, params) {
 
 export const api = {
   login: (username, password) => request('/api/auth/login', { method: 'POST', body: { username, password } }),
+  register: (body) => request('/api/auth/register', { method: 'POST', body }),
   me: async () => {
     if (!getToken()) return null
     try {
@@ -77,6 +82,7 @@ export const api = {
   adminAreas: () => request('/api/admin/areas'),
   saveArea: (body, id) => request(id ? `/api/admin/areas/${id}` : '/api/admin/areas', { method: id ? 'PUT' : 'POST', body }),
   deleteArea: (id) => request(`/api/admin/areas/${id}`, { method: 'DELETE' }),
+  customers: () => request('/api/admin/customers'),
   inquiries: () => request('/api/admin/inquiries'),
   markInquiry: (id, read) => request(`/api/admin/inquiries/${id}`, { method: 'PATCH', body: { read } }),
   deleteInquiry: (id) => request(`/api/admin/inquiries/${id}`, { method: 'DELETE' }),

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../../api'
 import { useTitle } from '../../format'
 import { Field } from './ui'
+import { PasswordInput } from '../../components/PasswordInput'
 
 export default function SettingsAdmin() {
   useTitle('الإعدادات')
@@ -53,8 +54,8 @@ export default function SettingsAdmin() {
       </form>
       <form className="panel form-grid" onSubmit={changePassword}>
         <h2 className="wide">تغيير كلمة المرور</h2>
-        <Field label="الحالية"><input type="password" value={password.current} onChange={(event) => setPassword({ ...password, current: event.target.value })} required /></Field>
-        <Field label="الجديدة"><input type="password" value={password.next} onChange={(event) => setPassword({ ...password, next: event.target.value })} required /></Field>
+        <Field label="الحالية"><PasswordInput value={password.current} onChange={(event) => setPassword({ ...password, current: event.target.value })} autoComplete="current-password" required /></Field>
+        <Field label="الجديدة"><PasswordInput value={password.next} onChange={(event) => setPassword({ ...password, next: event.target.value })} autoComplete="new-password" required /></Field>
         <button className="btn btn-navy" type="submit">تحديث كلمة المرور</button>
       </form>
     </>

@@ -1,0 +1,11 @@
+{
+  "name": "blue-home",
+  "compatibility_date": "2026-10-26",
+  "pages_build_output_dir": "./dist",
+  "kv_namespaces": [
+    {
+      "binding": "DATA",
+      "id": "852d2187caca4d49921bddeb08e01d4c"
+    }
+  ]
+}

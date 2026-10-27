@@ -115,7 +115,6 @@ export default function Home() {
 
       {error ? <p className="container msg-err">{error}</p> : null}
       {!data ? <p className="container state">جارٍ تحميل العقارات…</p> : null}
-      {data?.hasSample ? <p className="container sample-banner">بعض البطاقات تجريبية لتجربة المنصة وموسومة بكلمة «تجريبي». الأسعار فيها غير حقيقية، وتحذف من لوحة التحكم.</p> : null}
 
       {data?.projects?.length ? (
         <section className="section container">

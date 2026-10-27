@@ -46,7 +46,7 @@ export default function Dashboard() {
           {areas.map((area) => (
             <div className="bar-row" key={area.id}>
               <span>{area.name}</span>
-              <div className="bar"><span style={{ width: `${(area.count / max) * 100}%` }} /></div>
+              <div className="meter"><span style={{ width: `${(area.count / max) * 100}%` }} /></div>
               <b>{area.count}</b>
             </div>
           ))}
@@ -55,6 +55,7 @@ export default function Dashboard() {
           <h2>ابدأ من هنا</h2>
           <p className="quiet">أضف رقم الهاتف وواتساب من الإعدادات حتى تظهر أزرار الاتصال في صفحات الإعلان.</p>
           <div className="actions">
+            <Link className="btn btn-line" to="/admin/customers">العملاء {data ? `(${data.customers || 0})` : ''}</Link>
             <Link className="btn btn-line" to="/admin/inquiries">الطلبات {data ? `(${data.inquiries})` : ''}</Link>
             <Link className="btn btn-line" to="/admin/areas">المناطق</Link>
             <Link className="btn btn-line" to="/admin/settings">إعدادات التواصل</Link>

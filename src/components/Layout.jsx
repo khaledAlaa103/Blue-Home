@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api } from '../api'
 import { waLink } from '../format'
+import { AccountMenu } from './AccountMenu'
 
 const SiteContext = { current: null }
 export function useSite() {
@@ -27,7 +28,7 @@ export function Logo() {
 function Header({ open, setOpen }) {
   return (
     <header className="header">
-      <div className="container bar">
+      <div className="container topbar">
         <Link to="/" className="logo-link" aria-label="بلو هوم"><Logo /></Link>
         <button className="menu-btn" aria-expanded={open} aria-controls="site-nav" onClick={() => setOpen((value) => !value)}>القائمة</button>
         <nav id="site-nav" className={open ? 'nav open' : 'nav'}>
@@ -38,6 +39,7 @@ function Header({ open, setOpen }) {
           <NavLink to="/about">من نحن</NavLink>
           <NavLink to="/contact">تواصل معنا</NavLink>
         </nav>
+        <AccountMenu />
       </div>
     </header>
   )
@@ -66,13 +68,12 @@ function Footer({ site }) {
         </div>
         <div>
           <strong>التواصل</strong>
-          {settings.phone ? <a href={`tel:${settings.phone}`}>{settings.phone}</a> : <span className="quiet">الهاتف يُضاف من لوحة التحكم</span>}
+          {settings.phone ? <a href={`tel:${settings.phone}`}>{settings.phone}</a> : <span className="quiet">الهاتف يُضاف من حساب الأدمن</span>}
           {settings.email ? <a href={`mailto:${settings.email}`}>{settings.email}</a> : null}
           {settings.address ? <span>{settings.address}</span> : null}
           {settings.facebook ? <a href={settings.facebook} target="_blank" rel="noreferrer">فيسبوك</a> : null}
           {settings.instagram ? <a href={settings.instagram} target="_blank" rel="noreferrer">إنستغرام</a> : null}
           {settings.youtube ? <a href={settings.youtube} target="_blank" rel="noreferrer">يوتيوب</a> : null}
-          <Link to="/admin/login">لوحة التحكم</Link>
         </div>
       </div>
       <div className="container legal">© {year} بلو هوم</div>
@@ -87,10 +88,15 @@ export function PublicLayout() {
   SiteContext.current = site
   useEffect(() => { setOpen(false); window.scrollTo(0, 0) }, [path])
   useEffect(() => { api.bootstrap().then(setSite).catch(() => setSite(null)) }, [])
+  useEffect(() => {
+    document.body.classList.toggle('menu-lock', open)
+    return () => document.body.classList.remove('menu-lock')
+  }, [open])
   const whatsapp = site?.settings?.whatsapp
   return (
     <>
       <Header open={open} setOpen={setOpen} />
+      {open ? <button type="button" className="nav-backdrop" aria-label="إغلاق القائمة" onClick={() => setOpen(false)} /> : null}
       <main><Outlet context={site} /></main>
       <Footer site={site} />
       {whatsapp ? <a className="wa-float" href={waLink(whatsapp, 'مرحباً، أود الاستفسار عن عروض بلو هوم.')} target="_blank" rel="noreferrer">واتساب</a> : null}

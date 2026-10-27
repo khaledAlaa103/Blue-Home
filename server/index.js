@@ -1,17 +1,23 @@
 import express from 'express'
 import cors from 'cors'
-import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import multer from 'multer'
 import crypto from 'crypto'
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
-import { ensureDb, readDb, mutate, enrichListing, enrichProject, publicSettings, forgetImages, uploadDir } from './db.js'
+import { ensureDb, readDb, mutate, enrichListing, enrichProject, publicSettings, forgetImages, uploadDir, hashPassword, passwordMatches, isCloud } from './db.js'
 import { applyFilters, paginate, similarTo } from './filter.js'
 import { parseProject, parseListing, parseArea, parseSettings, parseTestimonial, parseInquiry } from './validate.js'
+import { accountExpired, customerRows, enforceCustomerLimits, isCurrent, RETENTION_YEARS, signupCount, USER_LIMIT } from './customers.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const __dirname = (() => {
+  try {
+    return import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : path.join('/tmp', 'blue-home')
+  } catch {
+    return path.join('/tmp', 'blue-home')
+  }
+})()
 const app = express()
 const isProd = process.env.NODE_ENV === 'production'
 const attempts = new Map()
@@ -19,7 +25,7 @@ const attempts = new Map()
 app.disable('x-powered-by')
 app.set('trust proxy', 1)
 app.use(cors())
-app.use(express.json({ limit: '1mb' }))
+app.use(express.json({ limit: '8mb' }))
 app.use('/api', (req, res, next) => {
   res.set('Cache-Control', 'no-store')
   next()
@@ -47,15 +53,29 @@ function readUser(req) {
   }
 }
 
+function roleOf(user) {
+  if (user?.role === 'admin' || user?.role === 'user') return user.role
+  return user?.username === 'admin' ? 'admin' : 'user'
+}
+
 function auth(req, res, next) {
   const user = readUser(req)
   if (!user) return res.status(401).json({ error: 'يلزم تسجيل الدخول' })
+  if (req.path.startsWith('/api/admin') && roleOf(user) !== 'admin') {
+    return res.status(403).json({ error: 'هذه الصفحة للأدمن فقط' })
+  }
   req.user = user
   next()
 }
 
 function publicUser(user) {
-  return { id: user.id, username: user.username }
+  return {
+    id: user.id,
+    username: user.username,
+    role: roleOf(user),
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+  }
 }
 
 function listingsOf(db) {
@@ -80,29 +100,70 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true })
 })
 
-app.post('/api/auth/login', (req, res) => {
-  const ip = req.ip || 'local'
-  const now = Date.now()
-  const recent = (attempts.get(ip) || []).filter((time) => now - time < 10 * 60 * 1000)
-  if (recent.length >= 8) return res.status(429).json({ error: 'محاولات كثيرة. حاول بعد عشر دقائق.' })
-  const db = readDb()
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const ip = req.ip || 'local'
+    const now = Date.now()
+    const recent = (attempts.get(ip) || []).filter((time) => now - time < 10 * 60 * 1000)
+    if (recent.length >= 8) return res.status(429).json({ error: 'محاولات كثيرة. حاول بعد عشر دقائق.' })
+    const db = readDb()
+    const username = String(req.body?.username || '').trim()
+    const password = String(req.body?.password || '')
+    const user = db.users.find((entry) => entry.username.toLowerCase() === username.toLowerCase())
+    if (user && accountExpired(user)) {
+      await mutate(() => ({ ok: true }))
+      return res.status(403).json({ error: 'انتهت مدة هذا الحساب بعد سنتين. يمكن إنشاء حساب جديد.' })
+    }
+    let ok = false
+    try {
+      ok = Boolean(user) && passwordMatches(user.passwordHash, password)
+    } catch {
+      ok = false
+    }
+    if (!ok) {
+      recent.push(now)
+      attempts.set(ip, recent)
+      return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' })
+    }
+    attempts.delete(ip)
+    const token = jwt.sign({ sub: user.id, username: user.username }, db.jwtSecret, { expiresIn: '12h' })
+    res.json({ token, user: publicUser(user) })
+  } catch {
+    res.status(500).json({ error: 'خطأ في الخادم' })
+  }
+})
+
+app.post('/api/auth/register', (req, res) => {
+  const firstName = String(req.body?.firstName || '').trim()
+  const lastName = String(req.body?.lastName || '').trim()
+  const phone = String(req.body?.phone || '').trim()
   const username = String(req.body?.username || '').trim()
   const password = String(req.body?.password || '')
-  const user = db.users.find((entry) => entry.username === username)
-  let ok = false
-  try {
-    ok = bcrypt.compareSync(password, user?.passwordHash || DUMMY_HASH) && Boolean(user)
-  } catch {
-    ok = false
-  }
-  if (!ok) {
-    recent.push(now)
-    attempts.set(ip, recent)
-    return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' })
-  }
-  attempts.delete(ip)
-  const token = jwt.sign({ sub: user.id, username: user.username }, db.jwtSecret, { expiresIn: '12h' })
-  res.json({ token, user: publicUser(user) })
+  const confirmPassword = String(req.body?.confirmPassword || '')
+  const address = String(req.body?.address || '').trim()
+  if (firstName.length < 2 || lastName.length < 2) return res.status(400).json({ error: 'اكتب الاسم الأول والاسم الثاني' })
+  if (!/^[\d+\s()-]{8,20}$/.test(phone)) return res.status(400).json({ error: 'رقم التليفون غير صحيح' })
+  if (!/^[A-Za-z0-9._-]{3,32}$/.test(username)) return res.status(400).json({ error: 'اسم المستخدم من 3 إلى 32 حرفًا إنجليزيًا أو رقمًا' })
+  if (password.length < 6) return res.status(400).json({ error: 'كلمة المرور 6 أحرف على الأقل' })
+  if (password !== confirmPassword) return res.status(400).json({ error: 'تأكيد كلمة المرور غير مطابق' })
+  if (address.length < 3) return res.status(400).json({ error: 'اكتب العنوان' })
+  save(res, (db) => {
+    if (db.users.some((entry) => entry.username.toLowerCase() === username.toLowerCase())) throw httpError('اسم المستخدم مستخدم')
+    const user = {
+      id: crypto.randomBytes(8).toString('hex'),
+      username,
+      passwordHash: hashPassword(password),
+      role: 'user',
+      firstName,
+      lastName,
+      phone,
+      address,
+      createdAt: new Date().toISOString(),
+    }
+    db.users.push(user)
+    const token = jwt.sign({ sub: user.id, username: user.username }, db.jwtSecret, { expiresIn: '12h' })
+    return { token, user: publicUser(user) }
+  }, 201)
 })
 
 app.get('/api/auth/me', auth, (req, res) => {
@@ -114,9 +175,9 @@ app.post('/api/auth/password', auth, (req, res) => {
     const user = db.users.find((entry) => entry.id === req.user.id)
     const current = String(req.body?.current || '')
     const next = String(req.body?.next || '')
-    if (!user || !bcrypt.compareSync(current, user.passwordHash)) throw httpError('كلمة المرور الحالية غير صحيحة')
+    if (!user || !passwordMatches(user.passwordHash, current)) throw httpError('كلمة المرور الحالية غير صحيحة')
     if (next.length < 6) throw httpError('كلمة المرور الجديدة 6 أحرف على الأقل')
-    user.passwordHash = bcrypt.hashSync(next, 10)
+    user.passwordHash = hashPassword(next)
     return { ok: true }
   })
 })
@@ -223,6 +284,7 @@ app.get('/api/admin/summary', auth, (req, res) => {
     available: db.listings.filter((item) => item.published && item.status === 'available' && item.type !== 'أرض').length,
     lands: db.listings.filter((item) => item.published && item.status === 'available' && item.type === 'أرض').length,
     inquiries: db.inquiries.length,
+    customers: customerRows(db).length,
     unread: db.inquiries.filter((item) => !item.read).length,
     samples: db.projects.filter((item) => item.isSample).length + db.listings.filter((item) => item.isSample).length,
     areas: db.areas.length,
@@ -344,9 +406,27 @@ app.delete('/api/admin/areas/:id', auth, (req, res) => {
   })
 })
 
+app.get('/api/admin/customers', auth, async (req, res) => {
+  try {
+    const data = await mutate((db) => {
+      enforceCustomerLimits(db)
+      return {
+        items: customerRows(db),
+        limit: USER_LIMIT,
+        accounts: signupCount(db),
+        requests: (db.inquiries || []).length,
+        retentionYears: RETENTION_YEARS,
+      }
+    })
+    res.json(data)
+  } catch {
+    res.status(500).json({ error: 'خطأ في الخادم' })
+  }
+})
+
 app.get('/api/admin/inquiries', auth, (req, res) => {
   const db = readDb()
-  const items = db.inquiries.map((item) => ({
+  const items = db.inquiries.filter((item) => isCurrent(item.createdAt)).map((item) => ({
     ...item,
     listingTitle: db.listings.find((listing) => listing.id === item.listingId)?.title || '',
     projectName: db.projects.find((project) => project.id === item.projectId)?.name || '',
@@ -430,15 +510,17 @@ app.post('/api/admin/sample-data/delete', auth, (req, res) => {
 })
 
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadDir),
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname || '').toLowerCase()
-      const safe = ['.jpg', '.jpeg', '.png', '.webp'].includes(ext) ? ext : '.jpg'
-      cb(null, `${crypto.randomBytes(8).toString('hex')}${safe}`)
-    },
-  }),
-  limits: { fileSize: 4 * 1024 * 1024 },
+  storage: isCloud()
+    ? multer.memoryStorage()
+    : multer.diskStorage({
+      destination: (req, file, cb) => cb(null, uploadDir),
+      filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname || '').toLowerCase()
+        const safe = ['.jpg', '.jpeg', '.png', '.webp'].includes(ext) ? ext : '.jpg'
+        cb(null, `${crypto.randomBytes(8).toString('hex')}${safe}`)
+      },
+    }),
+  limits: { fileSize: isCloud() ? 1.5 * 1024 * 1024 : 4 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) cb(null, true)
     else cb(httpError('الملف لازم يكون صورة JPG أو PNG أو WebP'))
@@ -449,6 +531,10 @@ app.post('/api/admin/upload', auth, (req, res, next) => {
   upload.single('file')(req, res, (error) => {
     if (error) return next(error)
     if (!req.file) return res.status(400).json({ error: 'اختر صورة' })
+    if (isCloud()) {
+      const mime = req.file.mimetype || 'image/jpeg'
+      return res.json({ url: `data:${mime};base64,${req.file.buffer.toString('base64')}` })
+    }
     res.json({ url: `/uploads/${req.file.filename}` })
   })
 })
@@ -470,19 +556,22 @@ if (isProd) {
 
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error)
-  if (error?.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'حجم الصورة أكبر من 4 ميجا' })
+  if (error?.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'حجم الصورة أكبر من الحد المسموح' })
   const status = error.status || 500
   if (status === 500) console.error(error)
   res.status(status).json({ error: status === 500 ? 'خطأ في الخادم' : error.message })
 })
 
-const DUMMY_HASH = bcrypt.hashSync('blue-home-dummy', 8)
-const port = process.env.PORT || 3001
-const server = app.listen(port, () => {
-  console.log(`Blue Home API http://127.0.0.1:${port}`)
-})
-server.on('error', (error) => {
-  if (error.code === 'EADDRINUSE') console.error('المنفذ 3001 مستخدم')
-  else console.error(error)
-  process.exit(1)
-})
+export default app
+
+if (!process.env.VERCEL && process.env.BLUE_HOME_LISTEN !== '0' && !isCloud()) {
+  const port = process.env.PORT || 3001
+  const server = app.listen(port, () => {
+    console.log(`Blue Home API http://127.0.0.1:${port}`)
+  })
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') console.error('المنفذ 3001 مستخدم')
+    else console.error(error)
+    process.exit(1)
+  })
+}

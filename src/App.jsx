@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { PublicLayout } from './components/Layout'
 import { RequireAdmin } from './auth'
 import Home from './pages/Home'
@@ -10,11 +10,13 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import NotFound from './pages/NotFound'
 import Login from './pages/admin/Login'
+import Signup from './pages/Signup'
 import AdminLayout from './pages/admin/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
 import ProjectsAdmin from './pages/admin/ProjectsAdmin'
 import ListingsAdmin from './pages/admin/ListingsAdmin'
 import AreasAdmin from './pages/admin/AreasAdmin'
+import CustomersAdmin from './pages/admin/CustomersAdmin'
 import InquiriesAdmin from './pages/admin/InquiriesAdmin'
 import TestimonialsAdmin from './pages/admin/TestimonialsAdmin'
 import SettingsAdmin from './pages/admin/SettingsAdmin'
@@ -22,13 +24,14 @@ import SettingsAdmin from './pages/admin/SettingsAdmin'
 export default function App() {
   return (
     <Routes>
-      <Route path="/admin/login" element={<Login />} />
+      <Route path="/admin/login" element={<Navigate to="/login" replace />} />
       <Route path="/admin" element={<RequireAdmin />}>
         <Route element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="projects" element={<ProjectsAdmin />} />
           <Route path="listings" element={<ListingsAdmin />} />
           <Route path="areas" element={<AreasAdmin />} />
+          <Route path="customers" element={<CustomersAdmin />} />
           <Route path="inquiries" element={<InquiriesAdmin />} />
           <Route path="testimonials" element={<TestimonialsAdmin />} />
           <Route path="settings" element={<SettingsAdmin />} />
@@ -44,6 +47,8 @@ export default function App() {
         <Route path="property/:id" element={<PropertyDetail />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

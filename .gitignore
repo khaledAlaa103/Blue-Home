@@ -1,6 +1,9 @@
 node_modules
 dist
 .tools
+.vercel
+.wrangler
 server/data.json
+server/hosts.json
 server/uploads/*
 !server/uploads/.gitkeep

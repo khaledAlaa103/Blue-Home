@@ -14,7 +14,6 @@ export function ListingCard({ item }) {
       <Link to={`/property/${item.id}`} className="card-media">
         <Cover src={item.images?.[0]} alt={item.title} />
         <span className={`pill st-${item.status}`}>{statusLabel(item.status)}</span>
-        {item.isSample ? <span className="pill sample">تجريبي</span> : null}
       </Link>
       <div className="card-body">
         <p className="meta">{item.type} · {item.areaName}</p>
@@ -39,7 +38,6 @@ export function ProjectCard({ item }) {
     <article className="card project-card">
       <Link to={`/projects/${item.id}`} className="card-media">
         <Cover src={item.images?.[0]} alt={item.name} />
-        {item.isSample ? <span className="pill sample">تجريبي</span> : null}
       </Link>
       <div className="card-body">
         <p className="meta">{item.areaName}{item.developer ? ` · ${item.developer}` : ''}</p>
