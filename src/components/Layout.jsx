@@ -4,6 +4,7 @@ import { api } from '../api'
 import { waLink } from '../format'
 import { AccountMenu } from './AccountMenu'
 import { PriceNotice } from './PriceGate'
+import { InstallPrompt } from './InstallPrompt'
 
 const SiteContext = { current: null }
 export function useSite() {
@@ -101,6 +102,7 @@ export function PublicLayout() {
       <main><Outlet context={site} /></main>
       <Footer site={site} />
       <PriceNotice />
+      <InstallPrompt />
       {whatsapp ? <a className="wa-float" href={waLink(whatsapp, 'مرحباً، أود الاستفسار عن عروض بلو هوم.')} target="_blank" rel="noreferrer">واتساب</a> : null}
     </>
   )

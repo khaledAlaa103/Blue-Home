@@ -279,6 +279,26 @@ button { cursor: pointer; }
 .notice p { margin: 0 0 18px; color: #475467; }
 .notice-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .notice-actions .btn { min-height: 48px; justify-content: center; }
+.install-bar {
+  position: fixed;
+  inset-inline: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(16, 36, 62, 0.22);
+}
+.install-icon { width: 48px; height: 48px; border-radius: 12px; flex: none; }
+.install-text { flex: 1; min-width: 0; display: grid; gap: 2px; font-size: 0.88rem; line-height: 1.5; color: #475467; }
+.install-text strong { color: var(--ink); font-size: 0.95rem; }
+.install-share { width: 18px; height: 18px; vertical-align: -4px; color: var(--blue); }
+.install-actions { display: flex; align-items: center; gap: 4px; flex: none; }
+.install-close { background: none; border: 0; font-size: 1.5rem; line-height: 1; color: var(--muted); width: 36px; height: 36px; }
 .notice-later { margin-top: 10px; background: none; border: 0; color: var(--muted); padding: 8px; text-decoration: underline; }
 .ppm { color: var(--muted); font-size: 0.82rem; }
 .facts-inline { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 6px 0 0; padding: 0; color: #475467; font-size: 0.86rem; }
