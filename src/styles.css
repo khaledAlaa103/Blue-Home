@@ -270,6 +270,9 @@ button { cursor: pointer; }
 .notice p { margin: 0 0 18px; color: #475467; }
 .notice-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .notice-actions .btn { min-height: 48px; justify-content: center; }
+.about-input { min-height: 220px; line-height: 1.8; }
+.about-body p { margin: 0; line-height: 1.9; }
+.about-body p + p { margin-top: 12px; }
 .video-field { display: grid; gap: 8px; }
 .video-field .btn { position: relative; cursor: pointer; }
 .video-field .btn.is-busy { opacity: 0.75; cursor: progress; }

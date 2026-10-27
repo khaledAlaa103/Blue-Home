@@ -294,7 +294,7 @@ export function parseSettings(body, current) {
       facebook: facebook.value,
       instagram: instagram.value,
       youtube: youtube.value,
-      about: text(body?.about, 2000),
+      about: text(body?.about, 5000),
     },
   }
 }

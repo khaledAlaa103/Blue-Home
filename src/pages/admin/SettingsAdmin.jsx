@@ -50,7 +50,8 @@ export default function SettingsAdmin() {
         <Field label="فيسبوك"><input value={form.facebook || ''} onChange={(event) => set('facebook', event.target.value)} placeholder="https://" /></Field>
         <Field label="إنستغرام"><input value={form.instagram || ''} onChange={(event) => set('instagram', event.target.value)} placeholder="https://" /></Field>
         <Field label="يوتيوب"><input value={form.youtube || ''} onChange={(event) => set('youtube', event.target.value)} placeholder="https://" /></Field>
-        <Field label="نبذة تظهر في من نحن" wide><textarea value={form.about || ''} onChange={(event) => set('about', event.target.value)} /></Field>
+        <Field label="صفحة من نحن" wide><textarea className="about-input" value={form.about || ''} onChange={(event) => set('about', event.target.value)} maxLength={5000} placeholder="اكتب الكلام اللي يظهر في صفحة من نحن" /></Field>
+        <p className="quiet wide">الكلام ده بس اللي بيظهر في صفحة من نحن. كل سطر جديد بيبقى فقرة لوحده.</p>
         <button className="btn btn-primary" type="submit">حفظ</button>
       </form>
       <form className="panel form-grid" onSubmit={changePassword}>
