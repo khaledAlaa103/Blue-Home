@@ -320,6 +320,23 @@ button { cursor: pointer; }
 .area-card span { color: var(--muted); }
 
 .why-grid, .quote-grid, .contact-grid, .split, .stats { display: grid; gap: 12px; }
+.contact-grid { gap: 16px; align-items: start; }
+.contact-card { display: grid; gap: 18px; padding: 24px; box-shadow: 0 10px 30px rgba(16, 36, 62, 0.05); }
+.contact-card h2 { margin: 0; font-size: 1.3rem; }
+.contact-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.contact-list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.contact-list li + li { border-top: 1px solid var(--line); }
+.contact-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; color: inherit; min-width: 0; }
+a.contact-row { transition: background-color 0.15s ease; }
+a.contact-row:hover { background: #f8faff; }
+.contact-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; flex: none; background: var(--soft); color: var(--blue); }
+.contact-icon svg { width: 20px; height: 20px; }
+.contact-icon.whatsapp { background: #e6f5f2; color: #128c7e; }
+.contact-icon.mail { background: #f1eefe; color: #6d4ed8; }
+.contact-icon.pin { background: #fff3e6; color: #c2620a; }
+.contact-text { display: grid; min-width: 0; }
+.contact-text small { color: var(--muted); font-size: 0.8rem; line-height: 1.4; }
+.contact-text b { font-weight: 700; color: var(--ink); overflow-wrap: anywhere; }
 .why, .quote, .panel, .facts, .info-card {
   background: white;
   border: 1px solid var(--line);
@@ -419,10 +436,17 @@ button { cursor: pointer; }
   font-weight: 800;
   background: white;
 }
-.btn-primary { background: var(--blue); color: white; }
+.btn { transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn-primary { background: var(--blue); color: white; box-shadow: 0 6px 16px rgba(29, 78, 216, 0.22); }
+.btn-primary:hover { background: var(--blue-d); }
 .btn-navy { background: var(--navy); color: white; }
 .btn-line { border-color: var(--line); background: white; }
-.btn-wa { background: #128c7e; color: white; }
+.btn-line:hover { border-color: #c9d7f5; background: #f8faff; }
+.btn-wa { background: #128c7e; color: white; box-shadow: 0 6px 16px rgba(18, 140, 126, 0.22); }
+.btn-wa:hover { background: #0e7368; }
+.btn-lg { min-height: 52px; padding: 0 20px; border-radius: 14px; font-size: 1rem; }
+.btn:active { transform: translateY(1px); }
 .btn-danger { background: var(--sold-bg); color: var(--sold); }
 .btn-sm { min-height: 38px; padding: 0 12px; font-size: 0.9rem; }
 .wide { grid-column: 1 / -1; }
