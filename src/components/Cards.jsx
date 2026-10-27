@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatNumber, formatPrice, statusLabel } from '../format'
+import { Price } from './PriceGate'
 
 export function Cover({ src, alt }) {
   const [failed, setFailed] = useState(false)
@@ -25,8 +26,8 @@ export function ListingCard({ item }) {
           {item.baths ? <li>{item.baths} حمام</li> : null}
         </ul>
         <div className="card-foot">
-          {item.price != null ? <strong className="price">{formatPrice(item.price)}</strong> : <span className="quiet">السعر غير مُدخل</span>}
-          {item.pricePerMeter != null ? <span className="ppm">{formatNumber(item.pricePerMeter)} / م²</span> : null}
+          {item.price != null ? <Price as="strong" className="price">{formatPrice(item.price)}</Price> : <span className="quiet">السعر غير مُدخل</span>}
+          {item.pricePerMeter != null ? <Price className="ppm" placeholder="00,000 / م²">{formatNumber(item.pricePerMeter)} / م²</Price> : null}
         </div>
       </div>
     </article>

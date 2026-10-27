@@ -255,6 +255,31 @@ button { cursor: pointer; }
 .card h3 { font-size: 1.05rem; }
 .card-foot { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin-top: 6px; }
 .price { font-weight: 800; font-variant-numeric: tabular-nums; }
+.price-locked { color: inherit; display: inline-block; }
+.price-blur { filter: blur(6px); user-select: none; pointer-events: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.notice-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(16, 36, 62, 0.55);
+}
+.notice {
+  width: min(420px, 100%);
+  background: white;
+  border-radius: 20px;
+  padding: 24px 20px 16px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(16, 36, 62, 0.3);
+}
+.notice h2 { font-size: 1.3rem; margin-bottom: 8px; }
+.notice p { margin: 0 0 18px; color: #475467; }
+.notice-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.notice-actions .btn { min-height: 48px; justify-content: center; }
+.notice-later { margin-top: 10px; background: none; border: 0; color: var(--muted); padding: 8px; text-decoration: underline; }
 .ppm { color: var(--muted); font-size: 0.82rem; }
 .facts-inline { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 6px 0 0; padding: 0; color: #475467; font-size: 0.86rem; }
 .facts-inline li { background: #f4f6f8; border-radius: 999px; padding: 2px 8px; }

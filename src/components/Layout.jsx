@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api } from '../api'
 import { waLink } from '../format'
 import { AccountMenu } from './AccountMenu'
+import { PriceNotice } from './PriceGate'
 
 const SiteContext = { current: null }
 export function useSite() {
@@ -99,6 +100,7 @@ export function PublicLayout() {
       {open ? <button type="button" className="nav-backdrop" aria-label="إغلاق القائمة" onClick={() => setOpen(false)} /> : null}
       <main><Outlet context={site} /></main>
       <Footer site={site} />
+      <PriceNotice />
       {whatsapp ? <a className="wa-float" href={waLink(whatsapp, 'مرحباً، أود الاستفسار عن عروض بلو هوم.')} target="_blank" rel="noreferrer">واتساب</a> : null}
     </>
   )

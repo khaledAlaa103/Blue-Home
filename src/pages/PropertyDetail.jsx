@@ -4,6 +4,7 @@ import { api } from '../api'
 import { ListingCard } from '../components/Cards'
 import { Gallery } from '../components/Gallery'
 import { InquiryForm } from '../components/InquiryForm'
+import { Price } from '../components/PriceGate'
 import { directVideo, formatDate, formatNumber, formatPrice, mapEmbed, mapLink, operationLabel, paymentLabel, statusLabel, telLink, useTitle, videoEmbed, waLink } from '../format'
 
 export default function PropertyDetail() {
@@ -39,11 +40,11 @@ export default function PropertyDetail() {
     ['الغرف', item.rooms || ''],
     ['الحمامات', item.baths || ''],
     ['السداد', paymentLabel(item.paymentType)],
-    ['المقدم', item.downPayment != null ? formatPrice(item.downPayment) : ''],
-    ['القسط', item.installmentAmount != null ? formatPrice(item.installmentAmount) : ''],
+    ['المقدم', item.downPayment != null ? <Price>{formatPrice(item.downPayment)}</Price> : ''],
+    ['القسط', item.installmentAmount != null ? <Price placeholder="00,000 ج.م">{formatPrice(item.installmentAmount)}</Price> : ''],
     ['مدة التقسيط', item.installmentMonths ? `${item.installmentMonths} شهر` : ''],
     ['ملاحظة السداد', item.paymentNote],
-    ['سعر المتر', item.pricePerMeter != null ? formatPrice(item.pricePerMeter) : ''],
+    ['سعر المتر', item.pricePerMeter != null ? <Price placeholder="00,000 ج.م">{formatPrice(item.pricePerMeter)}</Price> : ''],
     ['الحالة', statusLabel(item.status)],
     ['آخر تحديث', formatDate(item.updatedAt)],
   ].filter(([, value]) => value)
@@ -75,7 +76,7 @@ export default function PropertyDetail() {
           ) : null}
         </div>
         <aside className="facts">
-          {item.price != null ? <p className="price-lg">{formatPrice(item.price)}</p> : <p className="quiet">السعر غير مُدخل بعد</p>}
+          {item.price != null ? <Price as="p" className="price-lg">{formatPrice(item.price)}</Price> : <p className="quiet">السعر غير مُدخل بعد</p>}
           <span className={`pill st-${item.status}`} style={{ position: 'static' }}>{statusLabel(item.status)}</span>
           <dl className="kv">{rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
           <div className="cta-row">

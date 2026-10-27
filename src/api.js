@@ -1,4 +1,5 @@
 const TOKEN_KEY = 'bluehome_token'
+export const AUTH_EVENT = 'bluehome-auth'
 
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY)
@@ -7,6 +8,7 @@ export function getToken() {
 export function setToken(token) {
   if (token) localStorage.setItem(TOKEN_KEY, token)
   else localStorage.removeItem(TOKEN_KEY)
+  window.dispatchEvent(new Event(AUTH_EVENT))
 }
 
 async function request(path, { method = 'GET', body, form } = {}) {
