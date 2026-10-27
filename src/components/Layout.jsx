@@ -65,7 +65,7 @@ function Footer({ site }) {
       <div className="container footer-grid">
         <div>
           <Logo />
-          <p className="quiet">عرض الوحدات والمشاريع والأراضي كما يضيفها صاحب المنصة، في 6 أكتوبر والشيخ زايد وأكتوبر الجديدة.</p>
+          <p className="quiet">عرض الوحدات والمشاريع والأراضي</p>
         </div>
         <div>
           <strong>الصفحات</strong>
