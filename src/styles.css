@@ -562,6 +562,80 @@ a.contact-row:hover { background: #f8faff; }
 .pills { display: flex; gap: 8px; }
 .pills a { white-space: nowrap; border-radius: 999px; padding: 8px 14px; font-weight: 800; color: #344054; }
 .pills a.active { background: var(--navy); color: white; }
+.dash-actions { display: flex; gap: 8px; margin-inline-start: auto; flex: none; }
+.dash-current, .dash-nav-extra { display: none; }
+.dash-top .nav-toggle { display: none; }
+
+/* Admin header on phones and tablets: one row (logo, current section, menu), sections in a drop-down. */
+@media (max-width: 979px) {
+  .dash-top {
+    overflow: visible;
+    z-index: 50;
+    gap: 10px;
+    padding: 10px 14px;
+    padding-top: calc(10px + env(safe-area-inset-top));
+    background: #fff;
+    backdrop-filter: none;
+    border-bottom: 1px solid #d7dfeb;
+    box-shadow: 0 8px 22px rgba(16, 36, 62, 0.07);
+  }
+  .dash-logo { flex: none; }
+  .dash-current {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: var(--soft);
+    color: var(--blue-d);
+    font-weight: 800;
+    font-size: 0.92rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .dash-top .nav-toggle { display: grid; margin-inline-start: auto; }
+  .dash-actions { display: none; }
+  .dash-top .pills {
+    display: none;
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    z-index: 2;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 12px 14px;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0 0 18px 18px;
+    box-shadow: 0 18px 36px rgba(16, 36, 62, 0.16);
+    max-height: calc(100dvh - 70px);
+    overflow-y: auto;
+  }
+  .dash-top .pills.open { display: flex; animation: nav-drop 0.18s ease; }
+  .dash-top .pills a {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 1.02rem;
+    font-weight: 700;
+  }
+  .dash-top .pills a:not(.btn):hover { background: #f8faff; }
+  .dash-top .pills a.active { background: var(--soft); color: var(--blue-d); box-shadow: inset -3px 0 0 var(--blue); }
+  .dash-nav-extra {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .dash-nav-extra .btn { min-height: 46px; justify-content: center; }
+  .dash-top .pills .dash-nav-extra a.btn { border-radius: 12px; font-size: 1rem; justify-content: center; }
+}
 .dash-body { width: min(1180px, calc(100% - 28px)); margin: 8px auto 32px; display: grid; gap: 16px; }
 .dash-title { display: flex; justify-content: space-between; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
 .stat {

@@ -1,5 +1,5 @@
 import { handleApi } from './api.js'
-import { bindKv, hydrateFromKv } from '../server/db.js'
+import { bindKv, hydrateFromKv, readDb } from '../server/db.js'
 
 // Serves admin-uploaded files from R2. Videos need Range support: Safari won't play them without it.
 async function serveUpload(request, env, url) {
@@ -27,6 +27,40 @@ async function serveUpload(request, env, url) {
   return new Response(request.method === 'HEAD' ? null : object.body, { headers })
 }
 
+const xmlEscape = (value) => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+// Built from live data so every published listing, project and area page is listed for search engines.
+function sitemap(origin) {
+  const db = readDb()
+  const urls = [
+    ['/', '1.0', 'daily'],
+    ['/units', '0.9', 'daily'],
+    ['/projects', '0.9', 'daily'],
+    ['/lands', '0.9', 'daily'],
+    ['/search', '0.7', 'daily'],
+    ['/about', '0.4', 'monthly'],
+    ['/contact', '0.5', 'monthly'],
+  ].map(([path, priority, changefreq]) => ({ path, priority, changefreq }))
+  for (const area of db.areas || []) urls.push({ path: `/search?areaId=${encodeURIComponent(area.id)}`, priority: '0.8', changefreq: 'daily' })
+  for (const project of db.projects || []) {
+    if (project.published) urls.push({ path: `/projects/${encodeURIComponent(project.id)}`, priority: '0.8', changefreq: 'weekly', lastmod: project.updatedAt })
+  }
+  for (const listing of db.listings || []) {
+    if (listing.published) urls.push({ path: `/property/${encodeURIComponent(listing.id)}`, priority: '0.7', changefreq: 'weekly', lastmod: listing.updatedAt })
+  }
+  const body = urls.map(({ path, priority, changefreq, lastmod }) => [
+    '  <url>',
+    `    <loc>${xmlEscape(origin + path)}</loc>`,
+    lastmod ? `    <lastmod>${xmlEscape(String(lastmod).slice(0, 10))}</lastmod>` : '',
+    `    <changefreq>${changefreq}</changefreq>`,
+    `    <priority>${priority}</priority>`,
+    '  </url>',
+  ].filter(Boolean).join('\n')).join('\n')
+  return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`, {
+    headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=3600' },
+  })
+}
+
 export default {
   async fetch(request, env) {
     try {
@@ -38,6 +72,7 @@ export default {
       bindKv(env.DATA)
       await hydrateFromKv()
       if (url.pathname.startsWith('/api')) return handleApi(request, env)
+      if (url.pathname === '/sitemap.xml') return sitemap(url.origin)
       return env.ASSETS.fetch(request)
     } catch (error) {
       console.error(error?.stack || error)

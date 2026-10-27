@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api } from '../api'
-import { arabicList, contactNumbers, telLink, waLink } from '../format'
+import { arabicList, contactNumbers, telLink, useCanonical, waLink } from '../format'
 import { AccountMenu } from './AccountMenu'
 import { PriceNotice, useSignedIn } from './PriceGate'
 import { InstallPrompt } from './InstallPrompt'
@@ -101,6 +101,7 @@ export function PublicLayout() {
   const [open, setOpen] = useState(false)
   const path = useLocation().pathname
   SiteContext.current = site
+  useCanonical(path)
   useEffect(() => { setOpen(false); window.scrollTo(0, 0) }, [path])
   useEffect(() => { api.bootstrap().then(setSite).catch(() => setSite(null)) }, [])
   useEffect(() => {

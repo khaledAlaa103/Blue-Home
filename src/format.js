@@ -1,10 +1,21 @@
 import { useEffect } from 'react'
 import { labelOf, OPERATIONS, PAYMENTS, STATUSES, REQUEST_TYPES } from '../shared/constants.js'
 
+export const SITE_TITLE = 'بلو هوم | شقق وفلل وأراضي ومحلات للبيع في 6 أكتوبر وحدائق أكتوبر والشيخ زايد'
+
 export function useTitle(title) {
   useEffect(() => {
-    document.title = title ? `${title} | بلو هوم` : 'بلو هوم | Blue Home'
+    document.title = title ? `${title} | بلو هوم` : SITE_TITLE
   }, [title])
+}
+
+// Each page tells search engines its own address; otherwise every page claims to be the home page.
+export function useCanonical(pathname) {
+  useEffect(() => {
+    const href = `${window.location.origin}${pathname === '/' ? '/' : pathname.replace(/\/+$/, '')}`
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', href)
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', href)
+  }, [pathname])
 }
 
 export function formatPrice(value) {
