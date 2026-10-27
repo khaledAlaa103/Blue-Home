@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../api'
+import { bannerStyle } from '../banners'
 import { ProjectCard } from '../components/Cards'
 import { useTitle } from '../format'
 
@@ -27,7 +28,7 @@ export default function Projects() {
 
   return (
     <div className="container">
-      <header className="page-head">
+      <header className="page-head page-banner" style={bannerStyle('projects')}>
         <p className="crumbs">الرئيسية / المشاريع</p>
         <h1>المشاريع</h1>
         <p className="quiet">{items.length} مشروع منشور</p>

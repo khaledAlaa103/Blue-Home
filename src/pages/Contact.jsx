@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
+import { bannerStyle } from '../banners'
 import { InquiryForm } from '../components/InquiryForm'
 import { contactNumbers, telLink, useTitle, waLink } from '../format'
 
@@ -45,7 +46,7 @@ export default function Contact() {
   const hasDetails = phone || (whatsapp && whatsapp !== phone) || email || address
   return (
     <div className="container">
-      <header className="page-head"><h1>تواصل معنا</h1></header>
+      <header className="page-head page-banner" style={bannerStyle('contact')}><h1>تواصل معنا</h1></header>
       <div className="contact-grid">
         <section className="panel contact-card">
           <h2>بيانات التواصل</h2>

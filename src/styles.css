@@ -383,6 +383,19 @@ a.contact-row:hover { background: #f8faff; }
 .sample-banner { background: #fff8ea; color: #7a5410; border: 1px solid #f0ddb0; }
 
 .page-head { padding: 22px 0 8px; }
+/* Full-bleed photo banner from inside .container; same navy wash as Login/Sign up. */
+.page-banner {
+  margin: 0 calc(50% - 50vw) 20px;
+  padding: 56px calc(50vw - 50%) 40px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(14, 39, 68, 0.9) 0%, rgba(16, 36, 62, 0.76) 50%, rgba(24, 64, 170, 0.62) 100%),
+    var(--banner) center / cover no-repeat,
+    #0e2744;
+}
+.page-banner h1 { color: #fff; text-shadow: 0 2px 12px rgba(8, 18, 32, 0.3); }
+.page-banner .crumbs, .page-banner .quiet { color: rgba(255, 255, 255, 0.82); }
+.page-banner .kicker { color: #a9c8ff; }
 .page-head h1 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
 .crumbs { display: flex; flex-wrap: wrap; gap: 6px; color: var(--muted); font-size: 0.9rem; margin-bottom: 8px; }
 .results-layout { display: grid; gap: 16px; align-items: start; min-width: 0; }
@@ -760,6 +773,15 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .price { font-size: 1.05rem; }
   .page-head { padding: 18px 0 6px; }
   .page-head h1 { font-size: 1.5rem; }
+  .page-banner {
+    padding: 34px calc(50vw - 50%) 26px;
+    margin-bottom: 16px;
+    background:
+      linear-gradient(160deg, rgba(14, 39, 68, 0.9) 0%, rgba(16, 36, 62, 0.76) 55%, rgba(24, 64, 170, 0.62) 100%),
+      var(--banner-sm) center / cover no-repeat,
+      #0e2744;
+  }
+  .page-banner h1 { font-size: 1.7rem; }
   .tool-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .tool-row .filter-toggle, .tool-row .map-toggle { width: 100%; margin: 0; }
   .chips { flex-wrap: wrap; overflow: visible; gap: 8px; padding-bottom: 8px; max-width: 100%; }

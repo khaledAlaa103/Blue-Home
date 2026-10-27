@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../api'
+import { bannerStyle } from '../banners'
 import { ListingCard } from '../components/Cards'
 import { Filters, FILTER_KEYS } from '../components/Filters'
 import { ResultsMap } from '../components/ResultsMap'
@@ -64,7 +65,7 @@ export default function Listings({ group, title }) {
 
   return (
     <div className="container">
-      <header className="page-head">
+      <header className="page-head page-banner" style={bannerStyle(group)}>
         <p className="crumbs">الرئيسية / {title}</p>
         <h1>{title}</h1>
         <p className="quiet">{loading ? 'جارٍ التحميل…' : `${data?.total || 0} نتيجة`}</p>
