@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { customerRows, enforceCustomerLimits, USER_LIMIT } from './customers.js'
+import { customerRows, deleteCustomer, enforceCustomerLimits, isBlocked, phoneKey, setRowBlocked, textKey, unblockEntry, USER_LIMIT } from './customers.js'
 
 const now = new Date('2026-10-26T00:00:00.000Z')
 
@@ -61,4 +61,46 @@ test('replaces the oldest registration when the list reaches 10000', () => {
   assert.equal(db.inquiries.length, USER_LIMIT)
   assert.equal(db.inquiries.some((item) => item.id === 'newest-request'), true)
   assert.equal(db.inquiries.some((item) => item.id === 'request-0'), false)
+})
+
+test('a block remembers every Sign up field, so changing one does not get back in', () => {
+  assert.equal(phoneKey('+20 100 000 0000'), '01000000000')
+  assert.equal(phoneKey('00201000000000'), '01000000000')
+  assert.equal(textKey('سارة  أحمد'), textKey('ساره احمد'))
+  const db = {
+    users: [{ id: 'u1', username: 'Sara1', role: 'user', firstName: 'سارة', lastName: 'أحمد', phone: '01000000000', address: '6 أكتوبر، الحي الأول' }],
+    inquiries: [],
+  }
+  assert.equal(setRowBlocked(db, 'user-u1', true, now), true)
+  assert.equal(isBlocked(db, db.users[0]), true)
+  assert.equal(isBlocked(db, { phone: '+201000000000' }), true)
+  assert.equal(isBlocked(db, { phone: '01999999999', username: 'sara1' }), true)
+  assert.equal(isBlocked(db, { phone: '01999999999', username: 'new', firstName: 'ساره', lastName: 'احمد' }), true)
+  assert.equal(isBlocked(db, { phone: '01999999999', username: 'new', firstName: 'منى', lastName: 'علي', address: '6 اكتوبر الحي الاول' }), true)
+  assert.equal(isBlocked(db, { phone: '01999999999', username: 'new', firstName: 'منى', lastName: 'علي', address: 'زايد' }), false)
+  assert.equal(isBlocked(db, { name: 'سارة أحمد', phone: '01888888888' }), true)
+  assert.equal(setRowBlocked(db, 'user-u1', false, now), true)
+  assert.equal(isBlocked(db, db.users[0]), false)
+  setRowBlocked(db, 'user-u1', true, now)
+  assert.equal(unblockEntry(db, db.blocked[0].id), true)
+  assert.equal((db.blocked || []).length, 0)
+  assert.equal(setRowBlocked(db, 'user-missing', true, now), false)
+})
+
+test('deletes a signup or a request by row id, never the admin', () => {
+  const db = {
+    users: [
+      { id: 'admin', username: 'admin', role: 'admin' },
+      { id: 'u1', username: 'sara', role: 'user', phone: '01000000000' },
+    ],
+    inquiries: [{ id: 'q1', name: 'منى', phone: '01111111111' }],
+  }
+  assert.equal(deleteCustomer(db, 'user-u1'), true)
+  assert.equal(deleteCustomer(db, 'inquiry-q1'), true)
+  assert.equal(deleteCustomer(db, 'user-admin'), false)
+  assert.equal(deleteCustomer(db, 'user-missing'), false)
+  assert.deepEqual(db.users.map((user) => user.id), ['admin'])
+  assert.equal(db.inquiries.length, 0)
+  const rows = customerRows({ users: [{ id: 'u2', role: 'user', phone: '01222222222', createdAt: '2026-10-01T00:00:00.000Z' }], inquiries: [], blocked: [{ id: 'b', phone: '01222222222' }] }, now)
+  assert.equal(rows[0].blocked, true)
 })

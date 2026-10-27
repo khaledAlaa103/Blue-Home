@@ -45,9 +45,23 @@ export function ImagesField({ images, onChange }) {
   const [url, setUrl] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState('')
-  async function onFiles(event) {
-    const files = [...event.target.files].slice(0, Math.max(0, 12 - images.length))
+  const [over, setOver] = useState(false)
+  const full = images.length >= 12
+
+  function onFiles(event) {
+    const list = [...event.target.files]
     event.target.value = ''
+    addFiles(list)
+  }
+
+  function onDrop(event) {
+    event.preventDefault()
+    setOver(false)
+    if (!busy && !full) addFiles([...event.dataTransfer.files].filter((file) => file.type.startsWith('image/')))
+  }
+
+  async function addFiles(list) {
+    const files = list.slice(0, Math.max(0, 12 - images.length))
     if (!files.length) return
     setError('')
     const uploaded = []
@@ -66,18 +80,35 @@ export function ImagesField({ images, onChange }) {
   return (
     <div className="wide">
       <span className="field"><strong>الصور</strong></span>
-      <div className="thumb-edit">
-        {images.map((src) => (
-          <figure key={src}>
-            <img src={src} alt="" />
-            <button type="button" onClick={() => { onChange(images.filter((item) => item !== src)); api.discardUpload(src) }}>حذف</button>
-          </figure>
-        ))}
-      </div>
-      <input type="file" accept="image/*" multiple disabled={Boolean(busy)} onChange={onFiles} />
-      {busy ? <p className="quiet">{busy}</p> : null}
-      <div className="actions">
-        <input value={url} onChange={(event) => setUrl(event.target.value)} placeholder="أو رابط https للصورة" />
+      {images.length ? (
+        <div className="thumb-edit">
+          {images.map((src, index) => (
+            <figure key={src}>
+              <img src={src} alt="" />
+              {index === 0 ? <span className="thumb-cover">الغلاف</span> : null}
+              <button type="button" aria-label="حذف الصورة" title="حذف الصورة" onClick={() => { onChange(images.filter((item) => item !== src)); api.discardUpload(src) }}>×</button>
+            </figure>
+          ))}
+        </div>
+      ) : null}
+      <label
+        className={['upload-drop', over ? 'is-over' : '', busy ? 'is-busy' : '', full ? 'is-full' : ''].filter(Boolean).join(' ')}
+        onDragOver={(event) => { event.preventDefault(); setOver(true) }}
+        onDragLeave={() => setOver(false)}
+        onDrop={onDrop}
+      >
+        <input type="file" accept="image/*" multiple hidden disabled={Boolean(busy) || full} onChange={onFiles} />
+        <span className="upload-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.6l1.4-2h5l1.4 2h1.6A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5Z" />
+            <circle cx="12" cy="12.5" r="3.3" />
+          </svg>
+        </span>
+        <strong>{busy || (full ? 'وصلت للحد الأقصى' : 'اختار صور من الجهاز')}</strong>
+        <small>{images.length} من 12 صورة · أي حجم، بتتصغّر تلقائياً{full ? '' : ' · أو اسحبها هنا'}</small>
+      </label>
+      <div className="url-row">
+        <input value={url} onChange={(event) => setUrl(event.target.value)} placeholder="أو حط رابط صورة https://…" inputMode="url" dir="ltr" />
         <button className="btn btn-line" type="button" onClick={() => { if (!url.startsWith('https://')) return setError('استخدم رابط https'); onChange([...images, url].slice(0, 12)); setUrl(''); setError('') }}>إضافة الرابط</button>
       </div>
       {error ? <p className="msg-err">{error}</p> : null}

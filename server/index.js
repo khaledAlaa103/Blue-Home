@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url'
 import { ensureDb, readDb, mutate, enrichListing, enrichProject, publicSettings, forgetImages, uploadDir, hashPassword, passwordMatches, isCloud } from './db.js'
 import { applyFilters, paginate, similarTo } from './filter.js'
 import { parseProject, parseListing, parseArea, parseSettings, parseTestimonial, parseInquiry } from './validate.js'
-import { accountExpired, customerRows, enforceCustomerLimits, isCurrent, RETENTION_YEARS, signupCount, USER_LIMIT } from './customers.js'
+import { accountExpired, BLOCKED_ACCOUNT, BLOCKED_PHONE, customerRows, deleteCustomer, enforceCustomerLimits, isBlocked, isCurrent, RETENTION_YEARS, setRowBlocked, signupCount, unblockEntry, USER_LIMIT } from './customers.js'
 import { IMAGE_MAX_BYTES, VIDEO_MAX_BYTES, VIDEO_TYPES, videoUploadError } from './video.js'
 import { latinDigits } from '../shared/constants.js'
 
@@ -49,7 +49,9 @@ function readUser(req) {
   const db = readDb()
   try {
     const payload = jwt.verify(token, db.jwtSecret)
-    return db.users.find((user) => user.id === payload.sub) || null
+    const user = db.users.find((entry) => entry.id === payload.sub) || null
+    if (user && roleOf(user) !== 'admin' && isBlocked(db, user)) return null
+    return user
   } catch {
     return null
   }
@@ -128,6 +130,7 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' })
     }
     attempts.delete(ip)
+    if (roleOf(user) !== 'admin' && isBlocked(db, user)) return res.status(403).json({ error: BLOCKED_ACCOUNT })
     const token = jwt.sign({ sub: user.id, username: user.username }, db.jwtSecret, { expiresIn: '12h' })
     res.json({ token, user: publicUser(user) })
   } catch {
@@ -150,6 +153,7 @@ app.post('/api/auth/register', (req, res) => {
   if (password !== confirmPassword) return res.status(400).json({ error: 'تأكيد كلمة المرور غير مطابق' })
   if (address.length < 3) return res.status(400).json({ error: 'اكتب العنوان' })
   save(res, (db) => {
+    if (isBlocked(db, { phone, username, firstName, lastName, address })) throw httpError(BLOCKED_PHONE, 403)
     if (db.users.some((entry) => entry.username.toLowerCase() === username.toLowerCase())) throw httpError('اسم المستخدم مستخدم')
     const user = {
       id: crypto.randomBytes(8).toString('hex'),
@@ -268,6 +272,7 @@ app.post('/api/inquiries', (req, res) => {
   if (parsed.error) return res.status(400).json({ error: parsed.error })
   if (parsed.value.spam) return res.json({ ok: true })
   save(res, (db) => {
+    if (isBlocked(db, parsed.value)) throw httpError(BLOCKED_PHONE, 403)
     db.inquiries.unshift(parsed.value)
     return { ok: true }
   }, 201)
@@ -418,12 +423,29 @@ app.get('/api/admin/customers', auth, async (req, res) => {
         accounts: signupCount(db),
         requests: (db.inquiries || []).length,
         retentionYears: RETENTION_YEARS,
+        blocked: db.blocked || [],
       }
     })
     res.json(data)
   } catch {
     res.status(500).json({ error: 'خطأ في الخادم' })
   }
+})
+
+app.delete('/api/admin/customers/:id', auth, (req, res) => {
+  save(res, (db) => {
+    if (!deleteCustomer(db, req.params.id)) throw httpError('العميل غير موجود', 404)
+    return { ok: true }
+  })
+})
+
+app.patch('/api/admin/blocked', auth, (req, res) => {
+  save(res, (db) => {
+    const body = req.body || {}
+    const done = body.id ? unblockEntry(db, String(body.id)) : setRowBlocked(db, body.rowId, Boolean(body.blocked))
+    if (!done) throw httpError('العميل غير موجود', 404)
+    return { ok: true, blocked: db.blocked }
+  })
 })
 
 app.get('/api/admin/inquiries', auth, (req, res) => {

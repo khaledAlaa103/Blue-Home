@@ -10,7 +10,7 @@ import {
 } from '../server/db.js'
 import { applyFilters, paginate, similarTo } from '../server/filter.js'
 import { parseProject, parseListing, parseArea, parseSettings, parseTestimonial, parseInquiry } from '../server/validate.js'
-import { accountExpired, customerRows, enforceCustomerLimits, isCurrent, RETENTION_YEARS, signupCount, USER_LIMIT } from '../server/customers.js'
+import { accountExpired, BLOCKED_ACCOUNT, BLOCKED_PHONE, customerRows, deleteCustomer, enforceCustomerLimits, isBlocked, isCurrent, RETENTION_YEARS, setRowBlocked, signupCount, unblockEntry, USER_LIMIT } from '../server/customers.js'
 import { IMAGE_MAX_BYTES, IMAGE_TYPES, VIDEO_TYPES, videoUploadError } from '../server/video.js'
 import { latinDigits } from '../shared/constants.js'
 
@@ -96,7 +96,10 @@ async function readUser(request) {
   if (!ok) return null
   const payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(body)))
   if (!payload?.exp || payload.exp < Date.now()) return null
-  return db.users.find((user) => user.id === payload.sub) || null
+  const user = db.users.find((entry) => entry.id === payload.sub) || null
+  // A block takes effect immediately: open sessions stop working too.
+  if (user && roleOf(user) !== 'admin' && isBlocked(db, user)) return null
+  return user
 }
 
 function queryOf(url) {
@@ -227,6 +230,8 @@ export async function handleApi(request, env = {}) {
     ['PUT', '/api/admin/areas/:id'],
     ['DELETE', '/api/admin/areas/:id'],
     ['GET', '/api/admin/customers'],
+    ['DELETE', '/api/admin/customers/:id'],
+    ['PATCH', '/api/admin/blocked'],
     ['GET', '/api/admin/inquiries'],
     ['PATCH', '/api/admin/inquiries/:id'],
     ['DELETE', '/api/admin/inquiries/:id'],
@@ -265,6 +270,7 @@ export async function handleApi(request, env = {}) {
       return json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' }, 401)
     }
     attempts.delete(ip)
+    if (roleOf(account) !== 'admin' && isBlocked(db, account)) return json({ error: BLOCKED_ACCOUNT }, 403)
     const token = await signToken({ sub: account.id, username: account.username }, db.jwtSecret)
     return json({ token, user: publicUser(account) })
   }
@@ -284,6 +290,7 @@ export async function handleApi(request, env = {}) {
     if (password !== confirmPassword) return json({ error: 'تأكيد كلمة المرور غير مطابق' }, 400)
     if (address.length < 3) return json({ error: 'اكتب العنوان' }, 400)
     return save((db) => {
+      if (isBlocked(db, { phone, username, firstName, lastName, address })) throw fail(BLOCKED_PHONE, 403)
       if (db.users.some((entry) => entry.username.toLowerCase() === username.toLowerCase())) throw fail('اسم المستخدم مستخدم')
       db.users.push({
         id: randomId(),
@@ -403,6 +410,7 @@ export async function handleApi(request, env = {}) {
     if (parsed.error) return json({ error: parsed.error }, 400)
     if (parsed.value.spam) return json({ ok: true })
     return save((db) => {
+      if (isBlocked(db, parsed.value)) throw fail(BLOCKED_PHONE, 403)
       db.inquiries.unshift(parsed.value)
       return { ok: true }
     }, 201)
@@ -547,9 +555,25 @@ export async function handleApi(request, env = {}) {
         accounts: signupCount(db),
         requests: (db.inquiries || []).length,
         retentionYears: RETENTION_YEARS,
+        blocked: db.blocked || [],
       }
     })
     return json(data)
+  }
+
+  if (route[1] === '/api/admin/customers/:id' && request.method === 'DELETE') {
+    return save((db) => {
+      if (!deleteCustomer(db, params.id)) throw fail('العميل غير موجود', 404)
+      return { ok: true }
+    })
+  }
+
+  if (route[1] === '/api/admin/blocked') {
+    return save((db) => {
+      const done = body.id ? unblockEntry(db, String(body.id)) : setRowBlocked(db, body.rowId, Boolean(body.blocked))
+      if (!done) throw fail('العميل غير موجود', 404)
+      return { ok: true, blocked: db.blocked }
+    })
   }
 
   if (route[1] === '/api/admin/inquiries' && request.method === 'GET') {
