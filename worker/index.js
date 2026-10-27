@@ -6,7 +6,7 @@ async function serveUpload(request, env, url) {
   if (!env.MEDIA) return new Response('Not found', { status: 404 })
   if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed', { status: 405 })
   const key = decodeURIComponent(url.pathname.slice('/uploads/'.length))
-  if (!/^videos\/[a-f0-9]{16}\.(mp4|mov|webm|m4v)$/.test(key)) return new Response('Not found', { status: 404 })
+  if (!/^(videos\/[a-f0-9]{16}\.(mp4|mov|webm|m4v)|images\/[a-f0-9]{16}\.(jpg|png|webp))$/.test(key)) return new Response('Not found', { status: 404 })
   const object = await env.MEDIA.get(key, { range: request.headers, onlyIf: request.headers })
   if (!object) return new Response('Not found', { status: 404 })
   const headers = new Headers()

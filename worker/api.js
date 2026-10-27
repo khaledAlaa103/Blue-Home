@@ -11,7 +11,7 @@ import {
 import { applyFilters, paginate, similarTo } from '../server/filter.js'
 import { parseProject, parseListing, parseArea, parseSettings, parseTestimonial, parseInquiry } from '../server/validate.js'
 import { accountExpired, customerRows, enforceCustomerLimits, isCurrent, RETENTION_YEARS, signupCount, USER_LIMIT } from '../server/customers.js'
-import { VIDEO_TYPES, videoUploadError } from '../server/video.js'
+import { IMAGE_MAX_BYTES, IMAGE_TYPES, VIDEO_TYPES, videoUploadError } from '../server/video.js'
 import { latinDigits } from '../shared/constants.js'
 
 const attempts = new Map()
@@ -117,9 +117,32 @@ function matchRoute(pattern, pathname) {
   return params
 }
 
+// R2 keys of every uploaded image/video the site still shows.
+function uploadKeys(db) {
+  const keys = new Set()
+  for (const item of [...(db.projects || []), ...(db.listings || [])]) {
+    for (const url of [...(item.images || []), item.videoUrl]) {
+      if (typeof url === 'string' && url.startsWith('/uploads/')) keys.add(url.slice('/uploads/'.length))
+    }
+  }
+  return keys
+}
+
+let media = null
+
+// Any upload a save stops using (removed photo, replaced video, deleted listing) is deleted from R2 right away.
 async function save(work, status = 200) {
   try {
-    return json(await mutate(work), status)
+    let removed = []
+    const result = await mutate(async (db) => {
+      const before = uploadKeys(db)
+      const value = await work(db)
+      const after = uploadKeys(db)
+      removed = [...before].filter((key) => !after.has(key))
+      return value
+    })
+    if (media && removed.length) await media.delete(removed).catch((error) => console.error('R2 delete failed', error))
+    return json(result, status)
   } catch (error) {
     const code = error.status || 500
     if (code === 500) console.error(error)
@@ -149,7 +172,17 @@ async function uploadVideo(request, media) {
   return json({ url: `/uploads/${key}` })
 }
 
+// A photo/video removed in the editor before saving: delete it now unless a saved listing or project still uses it.
+async function discardUpload(body) {
+  const key = String(body?.url || '').replace(/^\/uploads\//, '')
+  if (!/^(videos\/[a-f0-9]{16}\.(mp4|mov|webm|m4v)|images\/[a-f0-9]{16}\.(jpg|png|webp))$/.test(key)) return json({ error: 'مسار غير صالح' }, 400)
+  if (uploadKeys(readDb()).has(key)) return json({ ok: true, kept: true })
+  if (media) await media.delete(key)
+  return json({ ok: true })
+}
+
 export async function handleApi(request, env = {}) {
+  media = env.MEDIA || null
   const url = new URL(request.url)
   const query = queryOf(url)
   const user = await readUser(request).catch(() => null)
@@ -163,6 +196,7 @@ export async function handleApi(request, env = {}) {
   }
 
   if (request.method === 'POST' && url.pathname === '/api/admin/upload-video') return uploadVideo(request, env.MEDIA)
+  if (request.method === 'DELETE' && url.pathname === '/api/admin/upload') return discardUpload(await bodyOf(request))
 
   const route = [
     ['GET', '/api/health'],
@@ -611,10 +645,13 @@ export async function handleApi(request, env = {}) {
     }
     const file = form.get('file')
     if (!file || typeof file.arrayBuffer !== 'function') return json({ error: 'اختر صورة' }, 400)
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return json({ error: 'الملف لازم يكون صورة JPG أو PNG أو WebP' }, 400)
-    if (file.size > 1.5 * 1024 * 1024) return json({ error: 'حجم الصورة أكبر من الحد المسموح' }, 400)
-    const bytes = new Uint8Array(await file.arrayBuffer())
-    return json({ url: `data:${file.type};base64,${bytesToBase64(bytes)}` })
+    const ext = IMAGE_TYPES[file.type]
+    if (!ext) return json({ error: 'الملف لازم يكون صورة JPG أو PNG أو WebP' }, 400)
+    if (file.size > IMAGE_MAX_BYTES) return json({ error: 'حجم الصورة أكبر من 8 ميجا' }, 413)
+    if (!env.MEDIA) return json({ error: 'تخزين الصور مش متفعّل على السيرفر لسه' }, 503)
+    const key = `images/${randomId()}.${ext}`
+    await env.MEDIA.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } })
+    return json({ url: `/uploads/${key}` })
   }
 
   return json({ error: 'غير موجود' }, 404)

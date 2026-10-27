@@ -72,7 +72,7 @@ function imagesOf(value) {
     const url = text(raw, 500)
     if (!url) continue
     if (url.startsWith('/uploads/')) {
-      if (!/^\/uploads\/[a-zA-Z0-9._-]+$/.test(url)) return fail('مسار صورة غير صالح')
+      if (!/^\/uploads\/(images\/)?[a-zA-Z0-9._-]+$/.test(url)) return fail('مسار صورة غير صالح')
       images.push(url)
     } else if (/^https:\/\/.{3,}/.test(url)) images.push(url)
     else return fail('استخدم صورة مرفوعة أو رابط https')

@@ -10,7 +10,7 @@ import { ensureDb, readDb, mutate, enrichListing, enrichProject, publicSettings,
 import { applyFilters, paginate, similarTo } from './filter.js'
 import { parseProject, parseListing, parseArea, parseSettings, parseTestimonial, parseInquiry } from './validate.js'
 import { accountExpired, customerRows, enforceCustomerLimits, isCurrent, RETENTION_YEARS, signupCount, USER_LIMIT } from './customers.js'
-import { VIDEO_MAX_BYTES, VIDEO_TYPES, videoUploadError } from './video.js'
+import { IMAGE_MAX_BYTES, VIDEO_MAX_BYTES, VIDEO_TYPES, videoUploadError } from './video.js'
 import { latinDigits } from '../shared/constants.js'
 
 const __dirname = (() => {
@@ -522,7 +522,7 @@ const upload = multer({
         cb(null, `${crypto.randomBytes(8).toString('hex')}${safe}`)
       },
     }),
-  limits: { fileSize: isCloud() ? 1.5 * 1024 * 1024 : 4 * 1024 * 1024 },
+  limits: { fileSize: IMAGE_MAX_BYTES },
   fileFilter: (req, file, cb) => {
     if (['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) cb(null, true)
     else cb(httpError('الملف لازم يكون صورة JPG أو PNG أو WebP'))

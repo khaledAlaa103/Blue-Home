@@ -6,6 +6,15 @@ export const VIDEO_TYPES = {
   'video/x-m4v': 'm4v',
 }
 
+export const IMAGE_TYPES = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+}
+
+// The admin page shrinks photos before upload; this only stops originals it couldn't shrink.
+export const IMAGE_MAX_BYTES = 8 * 1024 * 1024
+
 // Cloudflare rejects request bodies over 100 MB on the Free and Pro plans.
 export const VIDEO_MAX_BYTES = 95 * 1024 * 1024
 

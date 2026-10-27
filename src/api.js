@@ -98,6 +98,8 @@ export const api = {
     form.append('file', file)
     return request('/api/admin/upload', { method: 'POST', form })
   },
+  // Server keeps the file if a saved listing/project still uses it; otherwise it's deleted from storage.
+  discardUpload: (url) => (String(url).startsWith('/uploads/') ? request('/api/admin/upload', { method: 'DELETE', body: { url } }).catch(() => null) : Promise.resolve(null)),
   // XHR rather than fetch: fetch can't report upload progress, and videos take a while on mobile data.
   uploadVideo: (file, onProgress) => new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
