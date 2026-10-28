@@ -423,8 +423,9 @@ a.contact-row:hover { background: #f8faff; }
   white-space: nowrap;
 }
 .chips button.on { background: var(--navy); color: white; border-color: var(--navy); }
-.map-card { padding: 8px; overflow: hidden; min-height: 520px; }
-.map-frame { height: clamp(320px, 62vh, 560px); border-radius: 16px; }
+.map-card { padding: 8px; overflow: hidden; }
+/* Leaflet gives its panes z-index 400-1000; a stacking context keeps them inside the map instead of over the sticky header. */
+.map-frame { position: relative; z-index: 0; isolation: isolate; height: clamp(320px, 62vh, 560px); border-radius: 16px; }
 .map-embed { display: block; width: 100%; aspect-ratio: 16 / 9; min-height: 280px; border: 0; border-radius: 18px; background: #e8edf3; }
 .map-open { margin-top: 10px; }
 @media (max-width: 719px) {
@@ -749,6 +750,9 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .detail { grid-template-columns: minmax(0, 1fr) 340px; }
   .facts { position: sticky; top: 88px; }
   .results-layout { grid-template-columns: 280px minmax(0, 1fr) 320px; }
+  /* Desktop: the map stays in view below the header while the results scroll. */
+  .map-pane { position: sticky; top: 96px; }
+  .map-pane .map-frame { height: calc(100dvh - 130px); max-height: 640px; min-height: 320px; }
   .filter-toggle, .map-toggle, .sheet-close { display: none; }
   .why-grid { grid-template-columns: repeat(4, 1fr); }
 }
