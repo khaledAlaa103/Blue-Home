@@ -630,6 +630,7 @@ a.contact-row:hover { background: #f8faff; }
   gap: 12px;
 }
 .login-panel h1 { color: var(--navy); }
+.login-hero { display: none; }
 
 .dash { min-height: 100dvh; }
 .dash-top {
@@ -954,14 +955,29 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .password-field input { padding-inline-end: 52px; }
   .password-toggle { width: 44px; height: 44px; }
   .field textarea { min-height: 120px; }
+  /* Phones: the villa shows clearly across the top behind a welcome line, then fades to navy under the card. */
   .login-screen {
     min-height: calc(100dvh - 64px);
-    padding: 28px 14px calc(40px + env(safe-area-inset-bottom));
+    place-items: start center;
+    align-content: start;
+    gap: 0;
+    padding: 0 14px calc(32px + env(safe-area-inset-bottom));
     background:
-      linear-gradient(160deg, rgba(14, 39, 68, 0.9) 0%, rgba(16, 36, 62, 0.76) 55%, rgba(24, 64, 170, 0.62) 100%),
-      url("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=900&q=65") center / cover no-repeat,
+      linear-gradient(180deg, rgba(14, 39, 68, 0.28) 0px, rgba(14, 39, 68, 0.5) 150px, rgba(14, 39, 68, 0.92) 290px, #0e2744 380px),
+      url("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=900&q=70") center top / auto 400px no-repeat,
       #0e2744;
   }
+  .login-hero {
+    display: grid;
+    gap: 6px;
+    width: 100%;
+    padding: 64px 8px 26px;
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 2px 14px rgba(8, 18, 32, 0.55);
+  }
+  .login-hero strong { font-family: "Readex Pro", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif; font-size: 1.6rem; font-weight: 700; line-height: 1.3; }
+  .login-hero span { font-size: 0.98rem; color: rgba(255, 255, 255, 0.9); }
   .login-panel { padding: 22px 18px; border-radius: 20px; }
   .search-card .btn, .contact-form .btn, .stack-form .btn, .login-panel .btn, .filters-foot .btn, .cta-row .btn {
     width: 100%;

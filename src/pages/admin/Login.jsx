@@ -30,6 +30,10 @@ export default function Login() {
 
   return (
     <main className="login-screen">
+      <div className="login-hero">
+        <strong>أهلاً بعودتك</strong>
+        <span>سجّل دخولك لمتابعة العقارات والأسعار</span>
+      </div>
       <form className="login-panel" onSubmit={submit}>
         <span className="user-badge" aria-hidden="true"><UserIcon /></span>
         <h1>Login</h1>

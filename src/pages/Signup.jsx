@@ -39,6 +39,10 @@ export default function Signup() {
 
   return (
     <main className="login-screen">
+      <div className="login-hero">
+        <strong>انضم إلى بلو هوم</strong>
+        <span>أنشئ حسابك المجاني واطّلع على الأسعار الكاملة</span>
+      </div>
       <form className="login-panel" onSubmit={submit}>
         <h1>Sign up</h1>
         <p className="quiet">أنشئ حسابًا جديدًا على بلو هوم.</p>
