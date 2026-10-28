@@ -54,10 +54,30 @@ button { cursor: pointer; }
   box-shadow: 0 10px 28px rgba(16, 36, 62, 0.08);
 }
 .topbar { min-height: 78px; display: flex; align-items: center; gap: 22px; }
-.logo { display: flex; align-items: center; gap: 10px; }
-.logo-mark { width: 38px; height: 38px; flex: none; }
-.logo strong { display: block; font-size: 1.05rem; line-height: 1.2; }
-.logo small { display: block; color: var(--muted); letter-spacing: 0.12em; font-size: 0.68rem; line-height: 1.2; }
+.logo { display: flex; align-items: center; gap: 11px; }
+.logo-mark { width: 44px; height: 44px; flex: none; border-radius: 13px; box-shadow: 0 6px 16px rgba(29, 78, 216, 0.22); }
+.logo-text { display: grid; gap: 3px; }
+.logo strong {
+  display: block;
+  font-family: "Readex Pro", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--navy);
+  white-space: nowrap;
+}
+.logo small {
+  display: block;
+  direction: ltr;
+  text-align: right;
+  font-family: "Readex Pro", "Segoe UI", Arial, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  line-height: 1;
+  color: var(--blue);
+  white-space: nowrap;
+}
 .nav { display: none; align-items: center; gap: 2px; margin-inline-start: auto; }
 .nav a {
   padding: 8px 12px;
@@ -837,10 +857,10 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   h2 { font-size: 1.35rem; }
   .container, .narrow { width: min(1180px, calc(100% - 28px)); }
   .topbar { min-height: 64px; gap: 10px; padding-top: env(safe-area-inset-top); }
-  .logo { gap: 8px; }
-  .logo-mark { width: 36px; height: 36px; }
-  .logo strong { font-size: 1rem; }
-  .logo small { letter-spacing: 0.06em; font-size: 0.62rem; }
+  .logo { gap: 9px; }
+  .logo-mark { width: 40px; height: 40px; border-radius: 12px; }
+  .logo strong { font-size: 1.2rem; }
+  .logo small { letter-spacing: 0.18em; font-size: 0.62rem; }
   .menu-btn, .filter-toggle, .map-toggle {
     min-height: 44px;
     padding: 0 14px;
@@ -939,6 +959,17 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .pills a { min-height: 40px; display: inline-flex; align-items: center; }
   .bar-row { grid-template-columns: 1fr; }
   .btn:active { filter: brightness(0.94); }
+}
+
+/* Narrow phones (360-380px): tighten the logo and auth buttons so everything stays on one row. */
+@media (max-width: 380px) {
+  .topbar { gap: 6px; }
+  .logo { gap: 7px; }
+  .logo-mark { width: 36px; height: 36px; border-radius: 11px; }
+  .logo strong { font-size: 1.08rem; }
+  .logo small { font-size: 0.56rem; letter-spacing: 0.14em; }
+  .auth-links { gap: 5px; }
+  .auth-links a { padding: 0 11px; font-size: 0.86rem; }
 }
 
 /* Very narrow phones: the header keeps logo + menu; Login/Sign up move into the menu. */

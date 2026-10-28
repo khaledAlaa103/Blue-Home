@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api } from '../api'
 import { arabicList, contactNumbers, telLink, useCanonical, waLink } from '../format'
@@ -12,14 +12,23 @@ export function useSite() {
 }
 
 export function Logo() {
+  // The logo appears in the header and footer at once; a per-instance id keeps their gradients separate.
+  const gradient = `logo-grad-${useId().replace(/:/g, '')}`
   return (
     <span className="logo">
-      <svg className="logo-mark" viewBox="0 0 38 38" aria-hidden="true">
-        <rect width="38" height="38" rx="12" fill="#10243e" />
-        <path d="M8 18 L19 9 L30 18 V29 H8Z" fill="none" stroke="white" strokeWidth="2" />
-        <path d="M16 29 V21 H22 V29" fill="none" stroke="#8eb6ef" strokeWidth="2" />
+      <svg className="logo-mark" viewBox="0 0 44 44" aria-hidden="true">
+        <defs>
+          <linearGradient id={gradient} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#0e2744" />
+            <stop offset="1" stopColor="#1d4ed8" />
+          </linearGradient>
+        </defs>
+        <rect width="44" height="44" rx="13" fill={`url(#${gradient})`} />
+        <path d="M10 21.5 L22 11.5 L34 21.5" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M13.5 19.5 V32.5 H30.5 V19.5" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M19 32.5 V25.5 H25 V32.5" fill="#8fc0ff" />
       </svg>
-      <span>
+      <span className="logo-text">
         <strong>بلو هوم</strong>
         <small>BLUE HOME</small>
       </span>
