@@ -55,14 +55,28 @@ export function PriceNotice() {
   if (signedIn || seen || path === '/signup' || path === '/login') return null
   return (
     <div className="notice-backdrop" onClick={close}>
-      <div className="notice" role="dialog" aria-modal="true" aria-labelledby="price-notice-title" onClick={(event) => event.stopPropagation()}>
-        <h2 id="price-notice-title">الأسعار للمسجلين</h2>
-        <p>الأسعار هتظهر بمجرد ما تعمل Sign up. التسجيل مجاني وبياخد دقيقة.</p>
+      <div className="notice" role="dialog" aria-modal="true" aria-labelledby="price-notice-title" aria-describedby="price-notice-text" onClick={(event) => event.stopPropagation()}>
+        <button type="button" className="notice-close" aria-label="إغلاق" onClick={close}>×</button>
+        <span className="notice-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="5" y="10.5" width="14" height="10" rx="2.5" />
+            <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
+            <circle cx="12" cy="15.5" r="1.3" fill="currentColor" stroke="none" />
+          </svg>
+        </span>
+        <p className="notice-kicker">حصري للأعضاء</p>
+        <h2 id="price-notice-title">سجّل مجاناً لعرض الأسعار</h2>
+        <p id="price-notice-text">أنشئ حسابك في بلو هوم خلال دقيقة واحدة، واطّلع على الأسعار الكاملة لكل الوحدات والمشاريع.</p>
+        <ul className="notice-perks">
+          <li>أسعار كل الشقق والفلل والأراضي والمحلات</li>
+          <li>تفاصيل المقدّم والأقساط وسعر المتر</li>
+          <li>تواصل مباشر مع فريق المبيعات</li>
+        </ul>
         <div className="notice-actions">
-          <Link className="btn btn-primary" to="/signup" onClick={close}>Sign up</Link>
-          <Link className="btn btn-line" to="/login" onClick={close}>عندي حساب</Link>
+          <Link className="btn btn-primary" to="/signup" onClick={close}>إنشاء حساب مجاني</Link>
+          <Link className="btn btn-line" to="/login" onClick={close}>لديّ حساب: تسجيل الدخول</Link>
         </div>
-        <button type="button" className="notice-later" onClick={close}>تصفح بدون أسعار</button>
+        <button type="button" className="notice-later" onClick={close}>تصفّح بدون أسعار</button>
       </div>
     </div>
   )
