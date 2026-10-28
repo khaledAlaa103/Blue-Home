@@ -5,7 +5,8 @@ import { ListingCard } from '../components/Cards'
 import { Gallery } from '../components/Gallery'
 import { InquiryForm } from '../components/InquiryForm'
 import { Price } from '../components/PriceGate'
-import { contactNumbers, directVideo, formatDate, formatNumber, formatPrice, mapEmbed, mapLink, operationLabel, paymentLabel, statusLabel, telLink, useTitle, videoEmbed, waLink } from '../format'
+import { PropertyMap } from '../components/PropertyMap'
+import { contactNumbers, directVideo, formatDate, formatNumber, formatPrice, coordsOf, mapLink, operationLabel, paymentLabel, statusLabel, telLink, useTitle, videoEmbed, waLink } from '../format'
 
 export default function PropertyDetail() {
   const { id } = useParams()
@@ -49,7 +50,7 @@ export default function PropertyDetail() {
   ].filter(([, value]) => value)
   const embed = videoEmbed(item.videoUrl)
   const file = directVideo(item.videoUrl)
-  const map = mapEmbed(item.lat, item.lng)
+  const map = coordsOf(item.lat, item.lng)
   return (
     <div className="container">
       <header className="page-head">
@@ -69,7 +70,7 @@ export default function PropertyDetail() {
           {map ? (
             <section className="section">
               <h2>الموقع</h2>
-              <iframe className="map-embed" title="خريطة العقار" src={map} referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+              <PropertyMap coords={map} label={item.type} title={`موقع ${item.title}`} />
               <a className="btn btn-line map-open" href={mapLink(item.lat, item.lng)} target="_blank" rel="noreferrer">فتح في خرائط جوجل</a>
             </section>
           ) : null}

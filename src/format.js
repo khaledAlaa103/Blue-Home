@@ -99,14 +99,13 @@ export function directVideo(url) {
   return ''
 }
 
-export function mapEmbed(lat, lng) {
+// [lat, lng] when both are set and valid; null otherwise (Number(null) would be 0, a point off Africa).
+export function coordsOf(lat, lng) {
+  if (lat === null || lat === '' || lng === null || lng === '' || lat === undefined || lng === undefined) return null
   const la = Number(lat)
   const ln = Number(lng)
-  if (!Number.isFinite(la) || !Number.isFinite(ln) || Math.abs(la) > 90 || Math.abs(ln) > 180) return ''
-  // Google Maps opens already zoomed to street level (!6i16) with a pin on the property; no API key needed.
-  // This is the embed URL Google's own ?output=embed link redirects to; linking it directly avoids a redirect
-  // whose X-Frame-Options some browsers enforce, which left the frame blank.
-  return `https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s${la},${ln}!6i16!3m1!1sar!5m1!1sar`
+  if (!Number.isFinite(la) || !Number.isFinite(ln) || Math.abs(la) > 90 || Math.abs(ln) > 180) return null
+  return [la, ln]
 }
 
 // Opens the Google Maps app on phones (for directions), the website on desktop.

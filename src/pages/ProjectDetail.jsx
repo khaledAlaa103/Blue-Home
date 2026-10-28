@@ -4,7 +4,8 @@ import { api } from '../api'
 import { ListingCard } from '../components/Cards'
 import { Gallery } from '../components/Gallery'
 import { InquiryForm } from '../components/InquiryForm'
-import { formatDate, mapEmbed, mapLink, useTitle, videoEmbed, directVideo } from '../format'
+import { formatDate, coordsOf, mapLink, useTitle, videoEmbed, directVideo } from '../format'
+import { PropertyMap } from '../components/PropertyMap'
 
 export default function ProjectDetail() {
   const { id } = useParams()
@@ -22,7 +23,7 @@ export default function ProjectDetail() {
   if (!project) return <p className="container state">جارٍ التحميل…</p>
   const embed = videoEmbed(project.videoUrl)
   const file = directVideo(project.videoUrl)
-  const map = mapEmbed(project.lat, project.lng)
+  const map = coordsOf(project.lat, project.lng)
   return (
     <div className="container">
       <header className="page-head">
@@ -41,7 +42,7 @@ export default function ProjectDetail() {
           {map ? (
             <section>
               <h2>الموقع</h2>
-              <iframe className="map-embed" title="خريطة المشروع" src={map} referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+              <PropertyMap coords={map} label={project.name} title={`موقع ${project.name}`} />
               <a className="btn btn-line map-open" href={mapLink(project.lat, project.lng)} target="_blank" rel="noreferrer">فتح في خرائط جوجل</a>
             </section>
           ) : null}

@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-import { formatPrice } from '../format'
+import { coordsOf, formatPrice } from '../format'
+import { DEFAULT_CENTER, pinIcon, TILE_OPTIONS, TILES } from './mapPin'
 import { useSignedIn } from './PriceGate'
 
 export function ResultsMap({ items, active }) {
@@ -14,10 +14,8 @@ export function ResultsMap({ items, active }) {
 
   useEffect(() => {
     if (!node.current || mapRef.current) return undefined
-    const map = L.map(node.current, { scrollWheelZoom: false }).setView([29.98, 30.95], 11)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap',
-    }).addTo(map)
+    const map = L.map(node.current, { scrollWheelZoom: false }).setView(DEFAULT_CENTER, 11)
+    L.tileLayer(TILES, TILE_OPTIONS).addTo(map)
     layerRef.current = L.layerGroup().addTo(map)
     mapRef.current = map
     // Keep tiles filling the frame when the phone rotates or the panel opens.
@@ -33,22 +31,19 @@ export function ResultsMap({ items, active }) {
   useEffect(() => {
     const map = mapRef.current
     const layer = layerRef.current
-    if (!map || !layer) return
+    if (!map || !layer) return undefined
     layer.clearLayers()
-    // Number(null) is 0, which would drop a pin off the coast of Africa and zoom the map out to the whole world.
-    const located = (value) => value !== null && value !== '' && Number.isFinite(Number(value))
-    const points = items.filter((item) => located(item.lat) && located(item.lng))
-    points.forEach((item) => {
+    const points = items.map((item) => ({ item, at: coordsOf(item.lat, item.lng) })).filter((point) => point.at)
+    points.forEach(({ item, at }) => {
       const label = signedIn && item.price != null ? formatPrice(item.price).replace(' ج.م', '') : item.type
-      const icon = L.divIcon({ className: 'price-pin', html: `<span>${label}</span>`, iconAnchor: [30, 14] })
-      L.marker([Number(item.lat), Number(item.lng)], { icon }).addTo(layer).on('click', () => navigate(`/property/${item.id}`))
+      L.marker(at, { icon: pinIcon(label), title: item.title }).addTo(layer).on('click', () => navigate(`/property/${item.id}`))
     })
     // Measure the frame first (it may have just become visible), then zoom to the properties.
     const timer = setTimeout(() => {
       map.invalidateSize()
-      if (points.length === 1) map.setView([Number(points[0].lat), Number(points[0].lng)], 16)
-      else if (points.length) map.fitBounds(points.map((item) => [Number(item.lat), Number(item.lng)]), { padding: [40, 40], maxZoom: 16 })
-      else map.setView([29.98, 30.95], 11)
+      if (points.length === 1) map.setView(points[0].at, 16)
+      else if (points.length) map.fitBounds(points.map((point) => point.at), { padding: [50, 50], maxZoom: 16 })
+      else map.setView(DEFAULT_CENTER, 11)
     }, 60)
     return () => clearTimeout(timer)
   }, [items, active, navigate, signedIn])

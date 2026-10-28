@@ -475,25 +475,53 @@ a.contact-row:hover { background: #f8faff; }
 .map-card { padding: 8px; overflow: hidden; }
 /* Leaflet gives its panes z-index 400-1000; a stacking context keeps them inside the map instead of over the sticky header. */
 .map-frame { position: relative; z-index: 0; isolation: isolate; height: clamp(320px, 62vh, 560px); border-radius: 16px; }
-.map-embed { display: block; width: 100%; aspect-ratio: 16 / 9; min-height: 280px; border: 0; border-radius: 18px; background: #e8edf3; }
+/* A fixed height, not aspect-ratio + min-height: that pair forces a minimum width and pushed the page wider than the phone. */
+.map-embed { position: relative; z-index: 0; isolation: isolate; display: block; width: 100%; height: clamp(280px, 38vw, 440px); border: 0; border-radius: 18px; overflow: hidden; background: #e8edf3; }
 .map-open { margin-top: 10px; }
 @media (max-width: 719px) {
-  .map-embed { aspect-ratio: 4 / 3; border-radius: 14px; }
+  .map-embed { height: 300px; border-radius: 14px; }
   .map-open { width: 100%; }
 }
-.price-pin { background: transparent; border: 0; }
-.price-pin span {
-  display: inline-flex;
+/* Map pin: blue house marker whose tip sits on the property, with its type or price above. */
+.bh-pin { background: transparent; border: 0; }
+.bh-pin-inner {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  background: white;
-  color: var(--ink);
-  border-radius: 999px;
-  padding: 4px 8px;
-  font-weight: 800;
-  font-size: 12px;
-  box-shadow: 0 8px 18px rgba(16, 36, 62, 0.18);
-  white-space: nowrap;
+  gap: 4px;
+  cursor: pointer;
 }
+.bh-pin-label {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--navy);
+  font-family: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(16, 36, 62, 0.22);
+}
+.bh-pin-head {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 9px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: linear-gradient(135deg, #1d4ed8, #0e2744);
+  border: 2px solid #fff;
+  box-shadow: 0 8px 18px rgba(14, 39, 68, 0.35);
+  display: grid;
+  place-items: center;
+}
+.bh-pin-head svg { width: 20px; height: 20px; transform: rotate(45deg); }
+.bh-pin:hover .bh-pin-head { background: linear-gradient(135deg, #2563eb, #1e3a8a); }
 
 .detail { display: grid; gap: 16px; }
 .gallery-main, .gallery-main img { width: 100%; border-radius: 20px; aspect-ratio: 16/10; object-fit: cover; background: #e8edf3; }
@@ -749,6 +777,12 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
 .upload-drop small { color: var(--muted); font-size: 0.82rem; }
 .upload-icon { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: #fff; color: var(--blue); box-shadow: 0 4px 12px rgba(29, 78, 216, 0.12); margin-bottom: 4px; }
 .upload-icon svg { width: 24px; height: 24px; }
+.location-field { display: grid; gap: 8px; }
+.location-field > .quiet { margin: 0; }
+.location-map { position: relative; z-index: 0; isolation: isolate; height: 300px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); cursor: crosshair; }
+.location-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.location-status { color: var(--muted); font-size: 0.86rem; font-weight: 700; }
+.location-status.is-set { color: var(--ok); }
 .url-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-top: 10px; }
 .url-row input { width: 100%; min-height: 44px; border: 1px solid #d9dee8; border-radius: 12px; padding: 0 12px; background: #fff; text-align: left; }
 .url-row input::placeholder { text-align: right; }
@@ -807,7 +841,8 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
 @media (max-width: 979px) {
   .header { z-index: 50; }
   .topbar { gap: 8px; }
-  .logo-link { order: 0; min-width: 0; }
+  /* The logo never shrinks, so buttons can never slide over the BLUE HOME wordmark. */
+  .logo-link { order: 0; flex: none; }
   .account { order: 2; margin-inline-start: auto; }
   .account-guest .account-btn { display: none; }
   .auth-links { display: flex; align-items: center; gap: 6px; }
@@ -989,20 +1024,18 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .btn:active { filter: brightness(0.94); }
 }
 
-/* Narrow phones (360-380px): tighten the logo and auth buttons so everything stays on one row. */
+/* Narrow phones (360-380px): a slightly smaller logo. */
 @media (max-width: 380px) {
   .topbar { gap: 6px; }
   .logo { gap: 7px; }
   .logo-mark { width: 36px; height: 36px; border-radius: 11px; }
   .logo strong { font-size: 0.92rem; letter-spacing: 0.04em; }
   .logo small { font-size: 0.8rem; }
-  .auth-links { gap: 5px; }
-  .auth-links a { padding: 0 11px; font-size: 0.86rem; }
 }
 
-/* Very narrow phones: the header keeps logo + menu; Login/Sign up move into the menu. */
-@media (max-width: 349px) {
-  .auth-links { display: none; }
+/* Phones under 400px: the header keeps the logo, Sign up and the menu; Login (and Sign up) also sit in the menu. */
+@media (max-width: 399px) {
+  .auth-links a:not(.auth-signup) { display: none; }
   .nav-auth {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1013,6 +1046,10 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   }
   .nav .nav-auth .btn { justify-content: center; min-height: 46px; }
   .nav .nav-auth .btn-primary { color: #fff; }
+}
+
+@media (max-width: 319px) {
+  .auth-links { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

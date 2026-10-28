@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import L from 'leaflet'
 import { api } from '../../api'
-import { directVideo } from '../../format'
+import { coordsOf, directVideo } from '../../format'
+import { DEFAULT_CENTER, pinIcon, TILE_OPTIONS, TILES } from '../../components/mapPin'
 
 export function Field({ label, children, wide }) {
   return <label className={wide ? 'field wide' : 'field'}><span>{label}</span>{children}</label>
@@ -152,6 +154,90 @@ export function VideoField({ value, onChange }) {
       {progress != null ? <progress className="upload-progress" max="100" value={progress} /> : null}
       <p className="quiet">MP4 أو MOV لحد 95 ميجا. أو حط لينك يوتيوب:</p>
       <input value={uploaded ? '' : value || ''} placeholder="https://youtube.com/..." onChange={(event) => { if (uploaded) api.discardUpload(value); onChange(event.target.value) }} />
+      {error ? <p className="msg-err">{error}</p> : null}
+    </div>
+  )
+}
+
+const round6 = (value) => Math.round(value * 1e6) / 1e6
+
+// Pick the property's location by tapping the map, dragging the pin, or using the phone's GPS.
+export function LocationField({ lat, lng, label, onChange }) {
+  const node = useRef(null)
+  const mapRef = useRef(null)
+  const markerRef = useRef(null)
+  const [locating, setLocating] = useState(false)
+  const [error, setError] = useState('')
+  const at = coordsOf(lat, lng)
+
+  useEffect(() => {
+    if (!node.current) return undefined
+    const map = L.map(node.current, { scrollWheelZoom: false }).setView(at || DEFAULT_CENTER, at ? 16 : 11)
+    L.tileLayer(TILES, TILE_OPTIONS).addTo(map)
+    map.on('click', (event) => onChange(round6(event.latlng.lat), round6(event.latlng.lng)))
+    mapRef.current = map
+    const resize = new ResizeObserver(() => map.invalidateSize())
+    resize.observe(node.current)
+    return () => {
+      resize.disconnect()
+      map.remove()
+      mapRef.current = null
+      markerRef.current = null
+    }
+    // The map is created once; the effect below keeps the pin in sync with lat/lng.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+    if (!at) {
+      markerRef.current?.remove()
+      markerRef.current = null
+      return
+    }
+    if (!markerRef.current) {
+      markerRef.current = L.marker(at, { icon: pinIcon(label || 'العقار'), draggable: true }).addTo(map)
+      markerRef.current.on('dragend', () => {
+        const point = markerRef.current.getLatLng()
+        onChange(round6(point.lat), round6(point.lng))
+      })
+      map.setView(at, Math.max(map.getZoom(), 16))
+    } else {
+      markerRef.current.setLatLng(at)
+      // Another listing opened in the same editor: bring its pin into view.
+      if (!map.getBounds().contains(at)) map.setView(at, 16)
+    }
+  }, [at?.[0], at?.[1], label])
+
+  function locateMe() {
+    if (!navigator.geolocation) return setError('الجهاز ده مش بيدعم تحديد الموقع.')
+    setLocating(true)
+    setError('')
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocating(false)
+        onChange(round6(position.coords.latitude), round6(position.coords.longitude))
+        mapRef.current?.setView([position.coords.latitude, position.coords.longitude], 17)
+      },
+      () => {
+        setLocating(false)
+        setError('ما قدرناش نحدد موقعك. اسمح للمتصفح باستخدام الموقع، أو دوس على المكان في الخريطة.')
+      },
+      { enableHighAccuracy: true, timeout: 15000 },
+    )
+  }
+
+  return (
+    <div className="wide location-field">
+      <span className="field"><strong>مكان العقار على الخريطة</strong></span>
+      <p className="quiet">دوس على مكان العقار في الخريطة، أو اسحب الدبوس لمكانه بالظبط.</p>
+      <div ref={node} className="location-map" />
+      <div className="location-actions">
+        <button className="btn btn-navy btn-sm" type="button" disabled={locating} onClick={locateMe}>{locating ? 'جارٍ تحديد موقعك…' : 'استخدم موقعي الحالي'}</button>
+        {at ? <button className="btn btn-line btn-sm" type="button" onClick={() => onChange('', '')}>مسح المكان</button> : null}
+        <span className={at ? 'location-status is-set' : 'location-status'}>{at ? `✓ المكان متحدد (${at[0]}, ${at[1]})` : 'لسه ما اتحددش مكان'}</span>
+      </div>
       {error ? <p className="msg-err">{error}</p> : null}
     </div>
   )
