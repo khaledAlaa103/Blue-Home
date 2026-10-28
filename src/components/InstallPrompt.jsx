@@ -69,7 +69,7 @@ export function InstallPrompt() {
   if (hidden || !os || isInstalled()) return null
   return (
     <div className="install-bar" role="dialog" aria-labelledby="install-title">
-      <img src="/icons/icon-192.png" alt="" className="install-icon" />
+      <img src="/icons/icon-v2-192.png" alt="" className="install-icon" />
       <div className="install-text">
         <strong id="install-title">نزّل أبلكيشن بلو هوم</strong>
         {os === 'ios' ? (

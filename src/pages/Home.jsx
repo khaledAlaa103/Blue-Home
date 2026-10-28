@@ -161,16 +161,6 @@ export default function Home() {
       ) : null}
 
       <section className="section container">
-        <div className="section-head"><div><p className="kicker">الطريقة</p><h2>لماذا بلو هوم؟</h2></div></div>
-        <div className="why-grid">
-          <article className="why"><b>البيانات كما أُدخلت</b><p className="quiet">الخانة الفاضية لا تُملأ برقم تقريبي أو ميزة غير مكتوبة.</p></article>
-          <article className="why"><b>بحث يشتغل على الإعلانات</b><p className="quiet">المنطقة والسعر والمساحة والغرف ونظام السداد بتفلتر النتائج الفعلية.</p></article>
-          <article className="why"><b>غرب القاهرة، ومناطق إضافية</b><p className="quiet">6 أكتوبر والشيخ زايد وأكتوبر الجديدة، مع إمكانية إضافة منطقة من لوحة التحكم.</p></article>
-          <article className="why"><b>تواصل مباشر</b><p className="quiet">طلب المعاينة يصل لصاحب المنصة، والاتصال وواتساب يظهران بعد إضافة الرقم.</p></article>
-        </div>
-      </section>
-
-      <section className="section container">
         <div className="section-head"><div><p className="kicker">العملاء</p><h2>آراء العملاء</h2></div></div>
         {data?.testimonials?.length ? (
           <div className="quote-grid">

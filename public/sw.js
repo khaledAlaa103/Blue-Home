@@ -1,6 +1,6 @@
 // Pages: network first, cached copy when offline. Hashed build files: cache first.
 // The API, uploads and admin are never cached so listings and logins stay fresh.
-const CACHE = 'blue-home-v2'
+const CACHE = 'blue-home-v3'
 
 self.addEventListener('install', () => self.skipWaiting())
 

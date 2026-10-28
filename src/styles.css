@@ -57,24 +57,25 @@ button { cursor: pointer; }
 .logo { display: flex; align-items: center; gap: 11px; }
 .logo-mark { width: 44px; height: 44px; flex: none; border-radius: 13px; box-shadow: 0 6px 16px rgba(29, 78, 216, 0.22); }
 .logo-text { display: grid; gap: 3px; }
+/* English name on top (the brand line), Arabic name under it. */
 .logo strong {
   display: block;
-  font-family: "Readex Pro", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
-  font-size: 1.35rem;
+  direction: ltr;
+  text-align: right;
+  font-family: "Readex Pro", "Segoe UI", Arial, sans-serif;
+  font-size: 1.12rem;
   font-weight: 700;
+  letter-spacing: 0.08em;
   line-height: 1.05;
   color: var(--navy);
   white-space: nowrap;
 }
 .logo small {
   display: block;
-  direction: ltr;
-  text-align: right;
-  font-family: "Readex Pro", "Segoe UI", Arial, sans-serif;
-  font-size: 0.68rem;
+  font-family: "Readex Pro", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 0.95rem;
   font-weight: 700;
-  letter-spacing: 0.24em;
-  line-height: 1;
+  line-height: 1.1;
   color: var(--blue);
   white-space: nowrap;
 }
@@ -372,7 +373,7 @@ button { cursor: pointer; }
 .area-card strong { font-size: 1.45rem; }
 .area-card span { color: var(--muted); }
 
-.why-grid, .quote-grid, .contact-grid, .split, .stats { display: grid; gap: 12px; }
+.quote-grid, .contact-grid, .split, .stats { display: grid; gap: 12px; }
 .contact-grid { gap: 16px; align-items: start; }
 .contact-card { display: grid; gap: 18px; padding: 24px; box-shadow: 0 10px 30px rgba(16, 36, 62, 0.05); }
 .contact-card h2 { margin: 0; font-size: 1.3rem; }
@@ -757,7 +758,7 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .look-grid { grid-template-columns: repeat(4, 1fr); }
   .grid-cards { grid-template-columns: 1fr 1fr; }
   .search-row { grid-template-columns: 1.2fr 0.8fr 0.8fr auto; }
-  .area-rail, .why-grid, .quote-grid { grid-template-columns: 1fr 1fr; }
+  .area-rail, .quote-grid { grid-template-columns: 1fr 1fr; }
   .stats { grid-template-columns: repeat(4, 1fr); }
   .contact-grid, .split, .form-grid { grid-template-columns: 1fr 1fr; }
   .footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; }
@@ -774,7 +775,6 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .map-pane { position: sticky; top: 96px; }
   .map-pane .map-frame { height: calc(100dvh - 130px); max-height: 640px; min-height: 320px; }
   .filter-toggle, .map-toggle, .sheet-close { display: none; }
-  .why-grid { grid-template-columns: repeat(4, 1fr); }
 }
 @media (max-width: 979px) {
   .header { z-index: 50; }
@@ -859,8 +859,8 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .topbar { min-height: 64px; gap: 10px; padding-top: env(safe-area-inset-top); }
   .logo { gap: 9px; }
   .logo-mark { width: 40px; height: 40px; border-radius: 12px; }
-  .logo strong { font-size: 1.2rem; }
-  .logo small { letter-spacing: 0.18em; font-size: 0.62rem; }
+  .logo strong { font-size: 1.02rem; letter-spacing: 0.06em; }
+  .logo small { font-size: 0.88rem; }
   .menu-btn, .filter-toggle, .map-toggle {
     min-height: 44px;
     padding: 0 14px;
@@ -966,8 +966,8 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .topbar { gap: 6px; }
   .logo { gap: 7px; }
   .logo-mark { width: 36px; height: 36px; border-radius: 11px; }
-  .logo strong { font-size: 1.08rem; }
-  .logo small { font-size: 0.56rem; letter-spacing: 0.14em; }
+  .logo strong { font-size: 0.92rem; letter-spacing: 0.04em; }
+  .logo small { font-size: 0.8rem; }
   .auth-links { gap: 5px; }
   .auth-links a { padding: 0 11px; font-size: 0.86rem; }
 }

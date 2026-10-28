@@ -29,8 +29,8 @@ export function Logo() {
         <path d="M19 32.5 V25.5 H25 V32.5" fill="#8fc0ff" />
       </svg>
       <span className="logo-text">
-        <strong>بلو هوم</strong>
-        <small>BLUE HOME</small>
+        <strong lang="en">BLUE HOME</strong>
+        <small>بلو هوم</small>
       </span>
     </span>
   )
