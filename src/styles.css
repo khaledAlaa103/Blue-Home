@@ -31,7 +31,8 @@ body {
   line-height: 1.7;
   overflow-x: clip;
 }
-body.menu-lock { overflow: hidden; }
+/* Lock scrolling on <html>, not <body>: an overflow on body makes it the scroller, and the sticky header jumps back to the top of the page. */
+html.menu-lock { overflow: hidden; }
 button, a, input, select, textarea { touch-action: manipulation; }
 img { max-width: 100%; display: block; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -423,7 +424,13 @@ a.contact-row:hover { background: #f8faff; }
 }
 .chips button.on { background: var(--navy); color: white; border-color: var(--navy); }
 .map-card { padding: 8px; overflow: hidden; min-height: 520px; }
-.map-frame { height: 560px; border-radius: 16px; }
+.map-frame { height: clamp(320px, 62vh, 560px); border-radius: 16px; }
+.map-embed { display: block; width: 100%; aspect-ratio: 16 / 9; min-height: 280px; border: 0; border-radius: 18px; background: #e8edf3; }
+.map-open { margin-top: 10px; }
+@media (max-width: 719px) {
+  .map-embed { aspect-ratio: 4 / 3; border-radius: 14px; }
+  .map-open { width: 100%; }
+}
 .price-pin { background: transparent; border: 0; }
 .price-pin span {
   display: inline-flex;

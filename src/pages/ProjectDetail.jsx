@@ -41,8 +41,8 @@ export default function ProjectDetail() {
           {map ? (
             <section>
               <h2>الموقع</h2>
-              <iframe className="video" title="خريطة المشروع" src={map} />
-              <a href={mapLink(project.lat, project.lng)} target="_blank" rel="noreferrer">فتح الخريطة</a>
+              <iframe className="map-embed" title="خريطة المشروع" src={map} referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+              <a className="btn btn-line map-open" href={mapLink(project.lat, project.lng)} target="_blank" rel="noreferrer">فتح في خرائط جوجل</a>
             </section>
           ) : null}
           <section className="section">

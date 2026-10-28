@@ -22,8 +22,8 @@ export default function AdminLayout() {
 
   useEffect(() => { setOpen(false) }, [path])
   useEffect(() => {
-    document.body.classList.toggle('menu-lock', open)
-    return () => document.body.classList.remove('menu-lock')
+    document.documentElement.classList.toggle('menu-lock', open)
+    return () => document.documentElement.classList.remove('menu-lock')
   }, [open])
 
   function logout() {

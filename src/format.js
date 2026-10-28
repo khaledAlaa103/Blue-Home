@@ -103,11 +103,13 @@ export function mapEmbed(lat, lng) {
   const la = Number(lat)
   const ln = Number(lng)
   if (!Number.isFinite(la) || !Number.isFinite(ln) || Math.abs(la) > 90 || Math.abs(ln) > 180) return ''
-  const pad = 0.02
-  const bbox = `${ln - pad},${la - pad},${ln + pad},${la + pad}`
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(`${la},${ln}`)}`
+  // Google Maps opens already zoomed to street level (!6i16) with a pin on the property; no API key needed.
+  // This is the embed URL Google's own ?output=embed link redirects to; linking it directly avoids a redirect
+  // whose X-Frame-Options some browsers enforce, which left the frame blank.
+  return `https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s${la},${ln}!6i16!3m1!1sar!5m1!1sar`
 }
 
+// Opens the Google Maps app on phones (for directions), the website on desktop.
 export function mapLink(lat, lng) {
-  return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=15/${lat}/${lng}`
+  return `https://www.google.com/maps/search/?api=1&query=${Number(lat)},${Number(lng)}`
 }

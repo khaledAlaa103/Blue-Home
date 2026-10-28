@@ -105,8 +105,8 @@ export function PublicLayout() {
   useEffect(() => { setOpen(false); window.scrollTo(0, 0) }, [path])
   useEffect(() => { api.bootstrap().then(setSite).catch(() => setSite(null)) }, [])
   useEffect(() => {
-    document.body.classList.toggle('menu-lock', open)
-    return () => document.body.classList.remove('menu-lock')
+    document.documentElement.classList.toggle('menu-lock', open)
+    return () => document.documentElement.classList.remove('menu-lock')
   }, [open])
   const { whatsapp } = contactNumbers(site?.settings)
   return (
