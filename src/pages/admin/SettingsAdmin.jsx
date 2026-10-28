@@ -2,12 +2,10 @@ import { useEffect, useState } from 'react'
 import { api } from '../../api'
 import { useTitle } from '../../format'
 import { Field } from './ui'
-import { PasswordInput } from '../../components/PasswordInput'
 
 export default function SettingsAdmin() {
   useTitle('الإعدادات')
   const [form, setForm] = useState(null)
-  const [password, setPassword] = useState({ current: '', next: '' })
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   useEffect(() => { api.bootstrap().then((data) => setForm(data.settings)).catch((err) => setError(err.message)) }, [])
@@ -19,16 +17,6 @@ export default function SettingsAdmin() {
       const saved = await api.saveSettings(form)
       setForm(saved)
       setMessage('تم حفظ بيانات التواصل')
-      setError('')
-    } catch (err) { setError(err.message); setMessage('') }
-  }
-
-  async function changePassword(event) {
-    event.preventDefault()
-    try {
-      await api.changePassword(password.current, password.next)
-      setPassword({ current: '', next: '' })
-      setMessage('تم تغيير كلمة المرور')
       setError('')
     } catch (err) { setError(err.message); setMessage('') }
   }
@@ -53,12 +41,6 @@ export default function SettingsAdmin() {
         <Field label="صفحة من نحن" wide><textarea className="about-input" value={form.about || ''} onChange={(event) => set('about', event.target.value)} maxLength={5000} placeholder="اكتب الكلام اللي يظهر في صفحة من نحن" /></Field>
         <p className="quiet wide">الكلام ده بس اللي بيظهر في صفحة من نحن. كل سطر جديد بيبقى فقرة لوحده.</p>
         <button className="btn btn-primary" type="submit">حفظ</button>
-      </form>
-      <form className="panel form-grid" onSubmit={changePassword}>
-        <h2 className="wide">تغيير كلمة المرور</h2>
-        <Field label="الحالية"><PasswordInput value={password.current} onChange={(event) => setPassword({ ...password, current: event.target.value })} autoComplete="current-password" required /></Field>
-        <Field label="الجديدة"><PasswordInput value={password.next} onChange={(event) => setPassword({ ...password, next: event.target.value })} autoComplete="new-password" required /></Field>
-        <button className="btn btn-navy" type="submit">تحديث كلمة المرور</button>
       </form>
     </>
   )

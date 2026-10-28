@@ -65,7 +65,6 @@ export const api = {
       throw error
     }
   },
-  changePassword: (current, next) => request('/api/auth/password', { method: 'POST', body: { current, next } }),
   bootstrap: () => request('/api/bootstrap'),
   home: () => request('/api/home'),
   projects: (params) => query('/api/projects', params),
