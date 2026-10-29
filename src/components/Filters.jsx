@@ -5,7 +5,7 @@ const MONTHS = [12, 24, 36, 48, 60, 72, 84, 120]
 export function Filters({ areas, projects, values, onChange, onSubmit, onReset, onClose, group }) {
   const set = (key) => (event) => onChange({ ...values, [key]: event.target.value })
   const types = group === 'lands' ? [] : group === 'units' ? PROPERTY_TYPES.filter((item) => item !== 'أرض') : PROPERTY_TYPES
-  const showRooms = group !== 'lands' && (!values.type || ROOM_TYPES.includes(values.type))
+  const showRooms = group !== 'lands' && group !== 'properties' && (!values.type || ROOM_TYPES.includes(values.type))
   const showPlan = values.payment !== 'cash'
   return (
     <form className={onClose ? 'filters open' : 'filters'} onSubmit={onSubmit}>
@@ -20,7 +20,7 @@ export function Filters({ areas, projects, values, onChange, onSubmit, onReset, 
             {areas.map((area) => <option key={area.id} value={area.id}>{area.name}</option>)}
           </select>
         </label>
-        {group !== 'lands' ? (
+        {group !== 'lands' && group !== 'properties' ? (
           <label className="field"><span>نوع العقار</span>
             <select value={values.type || ''} onChange={set('type')}>
               <option value="">الكل</option>
@@ -36,10 +36,12 @@ export function Filters({ areas, projects, values, onChange, onSubmit, onReset, 
             </select>
           </label>
         ) : null}
-        <label className="field"><span>اسم المشروع أو الكمبوند</span>
-          <input list="project-names" value={values.project || ''} onChange={set('project')} placeholder="اكتب جزءًا من الاسم" />
-          <datalist id="project-names">{projects.map((project) => <option key={project.id} value={project.name} />)}</datalist>
-        </label>
+        {group !== 'properties' ? (
+          <label className="field"><span>اسم المشروع أو الكمبوند</span>
+            <input list="project-names" value={values.project || ''} onChange={set('project')} placeholder="اكتب جزءًا من الاسم" />
+            <datalist id="project-names">{projects.map((project) => <option key={project.id} value={project.name} />)}</datalist>
+          </label>
+        ) : null}
         <label className="field"><span>السعر من</span><input className="num" inputMode="decimal" value={values.minPrice || ''} onChange={set('minPrice')} placeholder="ج.م" /></label>
         <label className="field"><span>السعر إلى</span><input className="num" inputMode="decimal" value={values.maxPrice || ''} onChange={set('maxPrice')} placeholder="ج.م" /></label>
         <label className="field"><span>المساحة من م²</span><input className="num" inputMode="decimal" value={values.minArea || ''} onChange={set('minArea')} /></label>

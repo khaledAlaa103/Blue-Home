@@ -73,14 +73,19 @@ export default function Home() {
                 <option value="">كل المناطق</option>
                 {areas.map((area) => <option key={area.id} value={area.id}>{area.name}</option>)}
               </select>
-              <select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })} aria-label="نوع العقار">
-                <option value="">نوع العقار</option>
-                {PROPERTY_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
-              </select>
-              <select value={form.rooms} onChange={(event) => setForm({ ...form, rooms: event.target.value })} aria-label="الغرف">
-                <option value="">الغرف</option>
-                {[1, 2, 3, 4, 5].map((count) => <option key={count} value={count}>{count}+ غرف</option>)}
-              </select>
+              {/* «العقارات» are whole buildings: type and rooms only apply to units. */}
+              {tab === 'units' ? (
+                <>
+                  <select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })} aria-label="نوع العقار">
+                    <option value="">نوع العقار</option>
+                    {PROPERTY_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+                  </select>
+                  <select value={form.rooms} onChange={(event) => setForm({ ...form, rooms: event.target.value })} aria-label="الغرف">
+                    <option value="">الغرف</option>
+                    {[1, 2, 3, 4, 5].map((count) => <option key={count} value={count}>{count}+ غرف</option>)}
+                  </select>
+                </>
+              ) : null}
               <select value={form.maxPrice} onChange={(event) => setForm({ ...form, maxPrice: event.target.value })} aria-label="نطاق السعر">
                 {PRICES.map(([value, label]) => <option key={label} value={value}>{label}</option>)}
               </select>

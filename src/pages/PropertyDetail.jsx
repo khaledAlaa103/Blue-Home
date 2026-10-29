@@ -6,6 +6,7 @@ import { Gallery } from '../components/Gallery'
 import { InquiryForm } from '../components/InquiryForm'
 import { Price } from '../components/PriceGate'
 import { PropertyMap } from '../components/PropertyMap'
+import { DELIVERIES, FINISHINGS, LEGAL_STATES, labelOf } from '../../shared/constants.js'
 import { contactNumbers, directVideo, formatDate, formatNumber, formatPrice, coordsOf, mapLink, operationLabel, paymentLabel, statusLabel, telLink, useTitle, videoEmbed, waLink } from '../format'
 
 export default function PropertyDetail() {
@@ -36,9 +37,15 @@ export default function PropertyDetail() {
     ['العملية', operationLabel(item.operation)],
     ['المنطقة', item.areaName],
     ['العنوان', item.address],
-    ['المساحة', item.areaSqm ? `${formatNumber(item.areaSqm)} م²` : ''],
+    [item.section === 'properties' ? 'مساحة الأرض' : 'المساحة', item.areaSqm ? `${formatNumber(item.areaSqm)} م²` : ''],
+    ['عدد الأدوار', item.floorsCount || ''],
+    ['عدد الوحدات', item.unitsCount || ''],
     ['الغرف', item.rooms || ''],
     ['الحمامات', item.baths || ''],
+    ['الدور', item.floor],
+    ['التشطيب', labelOf(FINISHINGS, item.finishing)],
+    ['الاستلام', [labelOf(DELIVERIES, item.delivery), item.delivery === 'construction' ? item.deliveryNote : ''].filter(Boolean).join(' · ')],
+    ['الوضع القانوني', labelOf(LEGAL_STATES, item.legal)],
     ['السداد', paymentLabel(item.paymentType)],
     ['المقدم', item.downPayment != null ? <Price>{formatPrice(item.downPayment)}</Price> : ''],
     ['القسط', item.installmentAmount != null ? <Price placeholder="00,000 ج.م">{formatPrice(item.installmentAmount)}</Price> : ''],
@@ -81,6 +88,7 @@ export default function PropertyDetail() {
         </div>
         <aside className="facts">
           {item.price != null ? <Price as="p" className="price-lg">{formatPrice(item.price)}</Price> : <p className="quiet">السعر غير مُدخل بعد</p>}
+          {item.negotiable && item.price != null ? <span className="negotiable">السعر قابل للتفاوض</span> : null}
           <span className={`pill st-${item.status}`} style={{ position: 'static' }}>{statusLabel(item.status)}</span>
           <dl className="kv">{rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
           <div className="cta-row">

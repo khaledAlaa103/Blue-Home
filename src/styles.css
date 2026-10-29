@@ -1099,6 +1099,22 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   .auth-links { display: none; }
 }
 
+/* Admin «العقارات» sale form: grouped sections with a legend each. */
+.sale-form { display: grid; gap: 18px; }
+.sale-form-title { margin: 0; font-size: 1.25rem; }
+.sale-section { margin: 0; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: #fbfcfe; min-width: 0; }
+.sale-section legend { padding: 0 8px; font-weight: 800; color: var(--navy); font-size: 1.02rem; }
+.sale-section > .quiet { margin: 0 0 10px; font-size: 0.9rem; }
+.sale-price-note { display: grid; align-content: end; gap: 2px; padding-bottom: 8px; }
+.sale-price-note strong { color: var(--blue-d); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.sale-checks { display: flex; flex-wrap: wrap; gap: 10px 22px; }
+.sale-actions .btn { min-width: 160px; min-height: 48px; }
+@media (max-width: 719px) {
+  .sale-section { padding: 12px; }
+  .sale-actions { display: grid; }
+}
+.negotiable { justify-self: start; border-radius: 999px; padding: 4px 12px; background: var(--soft); color: var(--blue-d); font-weight: 800; font-size: 0.85rem; }
+
 /* Footer: a call-to-action band, then a navy multi-column block and a legal bar. Phone first. */
 .footer {
   margin-top: 56px;

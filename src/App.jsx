@@ -13,6 +13,7 @@ import Signup from './pages/Signup'
 import AdminLayout from './pages/admin/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
 import ListingsAdmin from './pages/admin/ListingsAdmin'
+import PropertiesAdmin from './pages/admin/PropertiesAdmin'
 import AreasAdmin from './pages/admin/AreasAdmin'
 import CustomersAdmin from './pages/admin/CustomersAdmin'
 import InquiriesAdmin from './pages/admin/InquiriesAdmin'
@@ -26,9 +27,9 @@ export default function App() {
       <Route path="/admin" element={<RequireAdmin />}>
         <Route element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="properties" element={<ListingsAdmin key="properties" section="properties" />} />
+          <Route path="properties" element={<PropertiesAdmin />} />
           <Route path="projects" element={<Navigate to="/admin/properties" replace />} />
-          <Route path="listings" element={<ListingsAdmin key="listings" />} />
+          <Route path="listings" element={<ListingsAdmin />} />
           <Route path="areas" element={<AreasAdmin />} />
           <Route path="customers" element={<CustomersAdmin />} />
           <Route path="inquiries" element={<InquiriesAdmin />} />

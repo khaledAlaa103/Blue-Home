@@ -1,10 +1,13 @@
-import { PROPERTY_TYPES, ROOM_TYPES, OPERATIONS, PAYMENTS, STATUSES, REQUEST_TYPES, latinDigits } from '../shared/constants.js'
+import { PROPERTY_TYPES, ROOM_TYPES, OPERATIONS, PAYMENTS, STATUSES, REQUEST_TYPES, FINISHINGS, DELIVERIES, LEGAL_STATES, FLOOR_TYPES, BUILDING_TYPE, latinDigits } from '../shared/constants.js'
 
 const ROOM = new Set(ROOM_TYPES)
 const OPS = new Set(OPERATIONS.map((item) => item.id))
 const PAY = new Set(PAYMENTS.map((item) => item.id))
 const STATUS = new Set(STATUSES.map((item) => item.id))
 const REQUESTS = new Set(REQUEST_TYPES.map((item) => item.id))
+const FINISH = new Set(FINISHINGS.map((item) => item.id))
+const DELIVERY = new Set(DELIVERIES.map((item) => item.id))
+const LEGAL = new Set(LEGAL_STATES.map((item) => item.id))
 
 function fail(error) {
   return { error }
@@ -88,7 +91,7 @@ function coord(value, min, max, label) {
 }
 
 const PROJECT_KEYS = ['name', 'developer', 'areaId', 'address', 'description', 'features', 'lat', 'lng', 'videoUrl', 'virtualTourUrl', 'images', 'published', 'featured', 'isSample']
-const LISTING_KEYS = ['title', 'description', 'type', 'operation', 'areaId', 'projectId', 'address', 'price', 'areaSqm', 'rooms', 'baths', 'paymentType', 'downPayment', 'installmentAmount', 'installmentMonths', 'paymentNote', 'status', 'lat', 'lng', 'videoUrl', 'virtualTourUrl', 'features', 'images', 'published', 'featured', 'isOffer', 'isSample', 'section']
+const LISTING_KEYS = ['title', 'description', 'type', 'operation', 'areaId', 'projectId', 'address', 'price', 'areaSqm', 'rooms', 'baths', 'paymentType', 'downPayment', 'installmentAmount', 'installmentMonths', 'paymentNote', 'status', 'lat', 'lng', 'videoUrl', 'virtualTourUrl', 'features', 'images', 'published', 'featured', 'isOffer', 'isSample', 'section', 'finishing', 'floor', 'delivery', 'deliveryNote', 'legal', 'negotiable', 'floorsCount', 'unitsCount']
 
 export function parseProject(body, db, current) {
   const merged = {
@@ -161,6 +164,12 @@ export function parseListing(body, db, current) {
     isOffer: false,
     isSample: false,
     section: '',
+    finishing: '',
+    floor: '',
+    delivery: '',
+    deliveryNote: '',
+    legal: '',
+    negotiable: false,
     ...(current || {}),
     ...onlyKnown(body, LISTING_KEYS),
   }
@@ -169,10 +178,11 @@ export function parseListing(body, db, current) {
   if (section) {
     merged.operation = 'sale'
     merged.projectId = ''
+    merged.type = BUILDING_TYPE
   }
   const title = requiredText(merged.title, 'عنوان الإعلان', 140)
   if (title.error) return title
-  if (!PROPERTY_TYPES.includes(merged.type)) return fail('نوع العقار غير صالح')
+  if (!section && !PROPERTY_TYPES.includes(merged.type)) return fail('نوع العقار غير صالح')
   if (!OPS.has(merged.operation)) return fail('نوع العملية غير صالح')
   if (!PAY.has(merged.paymentType)) return fail('نظام السداد غير صالح')
   if (!STATUS.has(merged.status)) return fail('حالة العقار غير صالحة')
@@ -187,6 +197,10 @@ export function parseListing(body, db, current) {
   if (price.error) return price
   const areaSqm = optionalNumber(merged.areaSqm, 'المساحة', { max: 10000000 })
   if (areaSqm.error) return areaSqm
+  const floorsCount = optionalNumber(section ? merged.floorsCount : null, 'عدد الأدوار', { integer: true, max: 100 })
+  if (floorsCount.error) return floorsCount
+  const unitsCount = optionalNumber(section ? merged.unitsCount : null, 'عدد الوحدات', { integer: true, max: 1000 })
+  if (unitsCount.error) return unitsCount
   const rooms = optionalNumber(merged.rooms, 'الغرف', { integer: true, max: 20 })
   if (rooms.error) return rooms
   const baths = optionalNumber(merged.baths, 'الحمامات', { integer: true, max: 20 })
@@ -209,6 +223,10 @@ export function parseListing(body, db, current) {
   const tour = httpsOrEmpty(merged.virtualTourUrl, 'رابط الجولة')
   if (tour.error) return tour
   const residential = ROOM.has(merged.type)
+  const land = merged.type === 'أرض'
+  if (merged.finishing && !FINISH.has(merged.finishing)) return fail('نوع التشطيب غير صالح')
+  if (merged.delivery && !DELIVERY.has(merged.delivery)) return fail('حالة الاستلام غير صالحة')
+  if (merged.legal && !LEGAL.has(merged.legal)) return fail('الوضع القانوني غير صالح')
   const now = new Date().toISOString()
   return {
     value: {
@@ -241,6 +259,14 @@ export function parseListing(body, db, current) {
       isOffer: Boolean(merged.isOffer),
       isSample: Boolean(merged.isSample),
       section,
+      finishing: land ? '' : merged.finishing || '',
+      floor: FLOOR_TYPES.includes(merged.type) ? text(latinDigits(merged.floor), 40) : '',
+      delivery: merged.delivery || '',
+      deliveryNote: text(merged.deliveryNote, 80),
+      legal: merged.legal || '',
+      negotiable: Boolean(merged.negotiable),
+      floorsCount: floorsCount.value,
+      unitsCount: unitsCount.value,
       createdAt: current?.createdAt || now,
       updatedAt: now,
     },

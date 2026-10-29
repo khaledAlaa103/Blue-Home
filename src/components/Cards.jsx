@@ -12,7 +12,7 @@ const ICONS = {
 
 function iconOf(type) {
   if (type === 'أرض') return ICONS.land
-  if (type === 'شقة' || type === 'إداري') return ICONS.building
+  if (type === 'شقة' || type === 'إداري' || type === 'عقار') return ICONS.building
   if (type === 'محل تجاري') return ICONS.shop
   return ICONS.house
 }
@@ -65,6 +65,11 @@ function VideoCover({ url, alt, type }) {
   )
 }
 
+// Arabic counting: 3-10 take the plural (5 أدوار), other numbers the singular (12 دور).
+function countLabel(count, one, few) {
+  return `${count} ${count >= 3 && count <= 10 ? few : one}`
+}
+
 export function ListingCard({ item }) {
   const photo = item.images?.[0]
   return (
@@ -79,6 +84,8 @@ export function ListingCard({ item }) {
         {item.projectName ? <p className="quiet">{item.projectName}</p> : null}
         <ul className="facts-inline">
           {item.areaSqm ? <li>{formatNumber(item.areaSqm)} م²</li> : null}
+          {item.floorsCount ? <li>{countLabel(item.floorsCount, 'دور', 'أدوار')}</li> : null}
+          {item.unitsCount ? <li>{countLabel(item.unitsCount, 'وحدة', 'وحدات')}</li> : null}
           {item.rooms ? <li>{item.rooms} غرف</li> : null}
           {item.baths ? <li>{item.baths} حمام</li> : null}
         </ul>

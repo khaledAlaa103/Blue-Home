@@ -21,6 +21,30 @@ export const SORTS = [
   { id: 'area_desc', label: 'المساحة من الأكبر' },
   { id: 'area_asc', label: 'المساحة من الأصغر' },
 ]
+// Sale details shown on a property: finishing level, delivery and the contract's legal state.
+export const FINISHINGS = [
+  { id: 'red-brick', label: 'على الطوب الأحمر' },
+  { id: 'semi', label: 'نص تشطيب' },
+  { id: 'finished', label: 'تشطيب كامل' },
+  { id: 'super-lux', label: 'سوبر لوكس' },
+  { id: 'ultra-lux', label: 'ألترا سوبر لوكس' },
+  { id: 'furnished', label: 'مفروش' },
+]
+export const DELIVERIES = [
+  { id: 'ready', label: 'استلام فوري' },
+  { id: 'construction', label: 'تحت الإنشاء' },
+]
+export const LEGAL_STATES = [
+  { id: 'registered', label: 'مسجّل شهر عقاري' },
+  { id: 'primary', label: 'عقد ابتدائي' },
+  { id: 'court', label: 'صحة توقيع' },
+  { id: 'poa', label: 'توكيل' },
+]
+// Everything in «العقارات» is a whole building sold as one property.
+export const BUILDING_TYPE = 'عقار'
+// Floors only mean something for these; finishing applies to everything but land.
+export const FLOOR_TYPES = ['شقة', 'إداري', 'محل تجاري']
+
 export const REQUEST_TYPES = [
   { id: 'viewing', label: 'طلب معاينة' },
   { id: 'details', label: 'معرفة التفاصيل' },

@@ -87,7 +87,7 @@ export default function Listings({ group, title }) {
         />
         {!filtersOpen ? null : null}
         <section>
-          {group !== 'lands' ? (
+          {group !== 'lands' && group !== 'properties' ? (
             <div className="chips" aria-label="عدد الغرف">
               {chips.map((chip) => (
                 <button key={chip || 'all'} type="button" className={roomValue === chip ? 'on' : ''} onClick={() => setRoom(chip)}>{chip ? `${chip}+ غرف` : 'كل الغرف'}</button>
