@@ -51,6 +51,10 @@ export default function PropertyDetail() {
   const embed = videoEmbed(item.videoUrl)
   const file = directVideo(item.videoUrl)
   const map = coordsOf(item.lat, item.lng)
+  const video = embed
+    ? <iframe className="video" src={embed} title="فيديو العقار" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+    : file ? <video className="video" src={file} controls playsInline preload="metadata" /> : null
+  const videoFirst = Boolean(video) && !item.images?.length
   return (
     <div className="container">
       <header className="page-head">
@@ -60,12 +64,12 @@ export default function PropertyDetail() {
       </header>
       <div className="detail">
         <div className="detail-main">
-          <Gallery images={item.images || []} title={item.title} />
+          {/* No photos but a video: the video takes the gallery's place at the top. */}
+          {videoFirst ? video : <Gallery images={item.images || []} title={item.title} type={item.type} />}
           {item.description ? <section className="section"><h2>الوصف</h2><p>{item.description}</p></section> : null}
           {item.features?.length ? <ul className="feature-list">{item.features.map((feature) => <li key={feature}>{feature}</li>)}</ul> : null}
           {item.projectName ? <p>{item.projectPublished ? <Link to={`/projects/${item.projectId}`}>المشروع: {item.projectName}</Link> : `المشروع: ${item.projectName}`}</p> : null}
-          {embed ? <iframe className="video" src={embed} title="فيديو العقار" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /> : null}
-          {file ? <video className="video" src={file} controls playsInline preload="metadata" /> : null}
+          {videoFirst ? null : video}
           {item.virtualTourUrl ? <p><a className="btn btn-line" href={item.virtualTourUrl} target="_blank" rel="noreferrer">الجولة الافتراضية</a></p> : null}
           {map ? (
             <section className="section">
