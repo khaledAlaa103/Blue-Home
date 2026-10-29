@@ -34,7 +34,7 @@ export function staticRequest(path, { method = 'GET' } = {}) {
     return {
       settings: catalog.settings,
       areas,
-      projects: projects.filter((project) => project.featured).slice(0, 3),
+      properties: applyFilters(listings, { publishedOnly: true, group: 'properties' }).filter((item) => item.status !== 'sold').slice(0, 6),
       latest: applyFilters(listings, { publishedOnly: true, group: 'units' }).filter((item) => item.status !== 'sold').slice(0, 6),
       lands: applyFilters(listings, { publishedOnly: true, group: 'lands' }).filter((item) => item.status !== 'sold').slice(0, 3),
       offers: applyFilters(listings, { publishedOnly: true, offers: '1' }).slice(0, 6),

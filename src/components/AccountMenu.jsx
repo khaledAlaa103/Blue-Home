@@ -4,7 +4,7 @@ import { api, setToken } from '../api'
 
 const ADMIN_LINKS = [
   ['/admin', 'نظرة عامة'],
-  ['/admin/projects', 'المشاريع'],
+  ['/admin/properties', 'العقارات'],
   ['/admin/listings', 'الإعلانات'],
   ['/admin/areas', 'المناطق'],
   ['/admin/customers', 'العملاء'],

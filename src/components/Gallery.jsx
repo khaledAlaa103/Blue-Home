@@ -24,7 +24,7 @@ export function Gallery({ images = [], title }) {
   return (
     <div>
       <button className="gallery-main" type="button" onClick={() => setActive(current)}>
-        <Cover src={shown} alt={`${title} - صورة ${current + 1}`} />
+        <Cover src={shown} alt={`${title} - صورة ${current + 1}`} whole />
       </button>
       {images.length > 1 ? (
         <div className="thumbs">

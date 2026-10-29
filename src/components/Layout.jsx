@@ -47,7 +47,7 @@ function Header({ open, setOpen }) {
         </button>
         <nav id="site-nav" className={open ? 'nav open' : 'nav'}>
           <NavLink to="/" end>الرئيسية</NavLink>
-          <NavLink to="/projects">المشاريع</NavLink>
+          <NavLink to="/properties">العقارات</NavLink>
           <NavLink to="/units">الوحدات</NavLink>
           <NavLink to="/lands">الأراضي</NavLink>
           <NavLink to="/about">من نحن</NavLink>
@@ -75,11 +75,11 @@ function Footer({ site }) {
       <div className="container footer-grid">
         <div>
           <Logo />
-          <p className="quiet">عرض الوحدات والمشاريع والأراضي{areaNames ? ` في ${areaNames}` : ''}</p>
+          <p className="quiet">عرض العقارات والوحدات والأراضي{areaNames ? ` في ${areaNames}` : ''}</p>
         </div>
         <div>
           <strong>الصفحات</strong>
-          <Link to="/projects">المشاريع</Link>
+          <Link to="/properties">العقارات</Link>
           <Link to="/units">الوحدات</Link>
           <Link to="/lands">الأراضي</Link>
           <Link to="/search">بحث متقدم</Link>

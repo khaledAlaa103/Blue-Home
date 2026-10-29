@@ -3,17 +3,24 @@ import { Link } from 'react-router-dom'
 import { formatNumber, formatPrice, statusLabel } from '../format'
 import { Price } from './PriceGate'
 
-export function Cover({ src, alt }) {
+// whole: show the full photo (no cropping) over a blurred copy of itself that fills the frame.
+export function Cover({ src, alt, whole = false }) {
   const [failed, setFailed] = useState(false)
   if (!src || failed) return <div className="ph" role="img" aria-label={alt}><span>{alt}</span></div>
-  return <img src={src} alt={alt} onError={() => setFailed(true)} />
+  if (!whole) return <img src={src} alt={alt} onError={() => setFailed(true)} />
+  return (
+    <span className="cover-whole">
+      <img className="cover-fill" src={src} alt="" aria-hidden="true" />
+      <img className="cover-main" src={src} alt={alt} onError={() => setFailed(true)} />
+    </span>
+  )
 }
 
 export function ListingCard({ item }) {
   return (
     <article className="card">
       <Link to={`/property/${item.id}`} className="card-media">
-        <Cover src={item.images?.[0]} alt={item.title} />
+        <Cover src={item.images?.[0]} alt={item.title} whole />
         <span className={`pill st-${item.status}`}>{statusLabel(item.status)}</span>
       </Link>
       <div className="card-body">
@@ -34,17 +41,3 @@ export function ListingCard({ item }) {
   )
 }
 
-export function ProjectCard({ item }) {
-  return (
-    <article className="card project-card">
-      <Link to={`/projects/${item.id}`} className="card-media">
-        <Cover src={item.images?.[0]} alt={item.name} />
-      </Link>
-      <div className="card-body">
-        <p className="meta">{item.areaName}{item.developer ? ` · ${item.developer}` : ''}</p>
-        <h3><Link to={`/projects/${item.id}`}>{item.name}</Link></h3>
-        <p className="quiet">{item.listingCount ? `${item.listingCount} وحدة منشورة` : 'لا توجد وحدات منشورة بعد'}</p>
-      </div>
-    </article>
-  )
-}

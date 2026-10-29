@@ -35,7 +35,7 @@ function sitemap(origin) {
   const urls = [
     ['/', '1.0', 'daily'],
     ['/units', '0.9', 'daily'],
-    ['/projects', '0.9', 'daily'],
+    ['/properties', '0.9', 'daily'],
     ['/lands', '0.9', 'daily'],
     ['/search', '0.7', 'daily'],
     ['/about', '0.4', 'monthly'],

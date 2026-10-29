@@ -5,7 +5,7 @@ import { Logo } from '../../components/Layout'
 
 const LINKS = [
   ['/admin', 'نظرة عامة'],
-  ['/admin/projects', 'المشاريع'],
+  ['/admin/properties', 'العقارات'],
   ['/admin/listings', 'الإعلانات'],
   ['/admin/areas', 'المناطق'],
   ['/admin/customers', 'العملاء'],

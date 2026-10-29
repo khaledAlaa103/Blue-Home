@@ -88,7 +88,7 @@ function coord(value, min, max, label) {
 }
 
 const PROJECT_KEYS = ['name', 'developer', 'areaId', 'address', 'description', 'features', 'lat', 'lng', 'videoUrl', 'virtualTourUrl', 'images', 'published', 'featured', 'isSample']
-const LISTING_KEYS = ['title', 'description', 'type', 'operation', 'areaId', 'projectId', 'address', 'price', 'areaSqm', 'rooms', 'baths', 'paymentType', 'downPayment', 'installmentAmount', 'installmentMonths', 'paymentNote', 'status', 'lat', 'lng', 'videoUrl', 'virtualTourUrl', 'features', 'images', 'published', 'featured', 'isOffer', 'isSample']
+const LISTING_KEYS = ['title', 'description', 'type', 'operation', 'areaId', 'projectId', 'address', 'price', 'areaSqm', 'rooms', 'baths', 'paymentType', 'downPayment', 'installmentAmount', 'installmentMonths', 'paymentNote', 'status', 'lat', 'lng', 'videoUrl', 'virtualTourUrl', 'features', 'images', 'published', 'featured', 'isOffer', 'isSample', 'section']
 
 export function parseProject(body, db, current) {
   const merged = {
@@ -160,8 +160,15 @@ export function parseListing(body, db, current) {
     featured: false,
     isOffer: false,
     isSample: false,
+    section: '',
     ...(current || {}),
     ...onlyKnown(body, LISTING_KEYS),
+  }
+  // The «العقارات» section holds properties for sale only, not tied to a project.
+  const section = merged.section === 'properties' ? 'properties' : ''
+  if (section) {
+    merged.operation = 'sale'
+    merged.projectId = ''
   }
   const title = requiredText(merged.title, 'عنوان الإعلان', 140)
   if (title.error) return title
@@ -233,6 +240,7 @@ export function parseListing(body, db, current) {
       featured: Boolean(merged.featured),
       isOffer: Boolean(merged.isOffer),
       isSample: Boolean(merged.isSample),
+      section,
       createdAt: current?.createdAt || now,
       updatedAt: now,
     },

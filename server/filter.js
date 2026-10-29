@@ -30,6 +30,8 @@ export function applyFilters(items, query = {}) {
 
   const out = items.filter((item) => {
     if (q.publishedOnly && !item.published) return false
+    if (q.group === 'properties' && item.section !== 'properties') return false
+    if ((q.group === 'lands' || q.group === 'units') && item.section === 'properties') return false
     if (q.group === 'lands' && item.type !== 'أرض') return false
     if (q.group === 'units' && item.type === 'أرض') return false
     if (q.areaId && item.areaId !== q.areaId) return false

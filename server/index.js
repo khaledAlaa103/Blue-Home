@@ -217,7 +217,7 @@ app.get('/api/home', (req, res) => {
       name: area.name,
       count: listings.filter((item) => item.areaId === area.id).length,
     })),
-    projects: publishedProjects.filter((project) => project.featured).slice(0, 3),
+    properties: applyFilters(enriched, { publishedOnly: true, group: 'properties' }).filter((item) => item.status !== 'sold').slice(0, 6),
     latest,
     lands,
     offers,
@@ -287,6 +287,7 @@ app.get('/api/admin/summary', auth, (req, res) => {
   const db = readDb()
   res.json({
     projects: db.projects.length,
+    properties: db.listings.filter((item) => item.section === 'properties').length,
     listings: db.listings.length,
     available: db.listings.filter((item) => item.published && item.status === 'available' && item.type !== 'أرض').length,
     lands: db.listings.filter((item) => item.published && item.status === 'available' && item.type === 'أرض').length,

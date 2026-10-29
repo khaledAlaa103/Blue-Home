@@ -524,8 +524,13 @@ a.contact-row:hover { background: #f8faff; }
 .bh-pin:hover .bh-pin-head { background: linear-gradient(135deg, #2563eb, #1e3a8a); }
 
 .detail { display: grid; gap: 16px; }
-.gallery-main, .gallery-main img { width: 100%; border-radius: 20px; aspect-ratio: 16/10; object-fit: cover; background: #e8edf3; }
-.gallery-main { border: 0; padding: 0; display: block; }
+.gallery-main { width: 100%; border-radius: 20px; aspect-ratio: 16/10; background: #e8edf3; border: 0; padding: 0; display: block; overflow: hidden; }
+.gallery-main .ph { width: 100%; height: 100%; }
+/* Uploaded photos come in any shape: show all of it, and fill the spare space with a blurred copy. */
+.cover-whole { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: #0e2744; }
+.cover-whole img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.card-media .cover-whole img.cover-main, .cover-whole img.cover-main { object-fit: contain; }
+.cover-whole img.cover-fill { object-fit: cover; filter: blur(18px) brightness(0.8); transform: scale(1.15); }
 .thumbs { display: flex; gap: 8px; overflow-x: auto; margin-top: 8px; }
 .thumbs button { flex: 0 0 92px; height: 68px; border-radius: 12px; overflow: hidden; border: 2px solid transparent; padding: 0; background: #e8edf3; }
 .thumbs button.on { border-color: var(--blue); }

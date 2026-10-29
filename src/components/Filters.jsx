@@ -28,12 +28,14 @@ export function Filters({ areas, projects, values, onChange, onSubmit, onReset, 
             </select>
           </label>
         ) : null}
-        <label className="field"><span>نوع العملية</span>
-          <select value={values.operation || ''} onChange={set('operation')}>
-            <option value="">الكل</option>
-            {OPERATIONS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-          </select>
-        </label>
+        {group !== 'properties' ? (
+          <label className="field"><span>نوع العملية</span>
+            <select value={values.operation || ''} onChange={set('operation')}>
+              <option value="">الكل</option>
+              {OPERATIONS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+            </select>
+          </label>
+        ) : null}
         <label className="field"><span>اسم المشروع أو الكمبوند</span>
           <input list="project-names" value={values.project || ''} onChange={set('project')} placeholder="اكتب جزءًا من الاسم" />
           <datalist id="project-names">{projects.map((project) => <option key={project.id} value={project.name} />)}</datalist>

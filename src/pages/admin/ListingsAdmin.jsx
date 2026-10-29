@@ -5,17 +5,21 @@ import { formatPrice, statusLabel, useTitle } from '../../format'
 import { OPERATIONS, PAYMENTS, PROPERTY_TYPES, ROOM_TYPES, STATUSES } from '../../../shared/constants.js'
 import { emptyToNull, Field, ImagesField, LocationField, VideoField } from './ui'
 
-const empty = { title: '', description: '', type: 'شقة', operation: 'sale', areaId: '', projectId: '', address: '', price: '', areaSqm: '', rooms: '', baths: '', paymentType: 'cash', downPayment: '', installmentAmount: '', installmentMonths: '', paymentNote: '', status: 'available', lat: '', lng: '', videoUrl: '', virtualTourUrl: '', featuresText: '', images: [], published: true, featured: false, isOffer: false, isSample: false }
+const empty = { title: '', description: '', type: 'شقة', operation: 'sale', areaId: '', projectId: '', address: '', price: '', areaSqm: '', rooms: '', baths: '', paymentType: 'cash', downPayment: '', installmentAmount: '', installmentMonths: '', paymentNote: '', status: 'available', lat: '', lng: '', videoUrl: '', virtualTourUrl: '', featuresText: '', images: [], published: true, featured: false, isOffer: false, isSample: false, section: '' }
 
-export default function ListingsAdmin() {
-  useTitle('إدارة الإعلانات')
-  const [items, setItems] = useState([])
+// Also drives «العقارات» (section="properties"): the same form, but for sale only and without a project.
+export default function ListingsAdmin({ section = '' }) {
+  const forSale = section === 'properties'
+  const blank = forSale ? { ...empty, section, operation: 'sale' } : empty
+  useTitle(forSale ? 'إدارة العقارات' : 'إدارة الإعلانات')
+  const [all, setAll] = useState([])
+  const items = all.filter((item) => (item.section || '') === section)
   const [areas, setAreas] = useState([])
   const [projects, setProjects] = useState([])
-  const [form, setForm] = useState(empty)
+  const [form, setForm] = useState(blank)
   const [error, setError] = useState('')
   function load() {
-    api.adminListings().then((data) => setItems(data.items)).catch((err) => setError(err.message))
+    api.adminListings().then((data) => setAll(data.items)).catch((err) => setError(err.message))
     api.adminAreas().then((data) => setAreas(data.items)).catch(() => {})
     api.adminProjects().then((data) => setProjects(data.items)).catch(() => {})
   }
@@ -25,7 +29,7 @@ export default function ListingsAdmin() {
 
   function edit(item) {
     setForm({
-      ...empty,
+      ...blank,
       ...item,
       price: item.price ?? '',
       areaSqm: item.areaSqm ?? '',
@@ -60,7 +64,7 @@ export default function ListingsAdmin() {
     }
     try {
       await api.saveListing(body, form.id)
-      setForm(empty)
+      setForm(blank)
       setError('')
       load()
     } catch (err) { setError(err.message) }
@@ -72,13 +76,14 @@ export default function ListingsAdmin() {
 
   return (
     <>
-      <h1>الإعلانات</h1>
+      <h1>{forSale ? 'العقارات' : 'الإعلانات'}</h1>
+      {forSale ? <p className="quiet">العقارات المعروضة للبيع، وبتظهر في صفحة «العقارات» على الموقع.</p> : null}
       <form className="panel form-grid" onSubmit={save}>
         <Field label="عنوان الإعلان" wide><input value={form.title} onChange={(event) => set('title', event.target.value)} required /></Field>
         <Field label="نوع العقار"><select value={form.type} onChange={(event) => set('type', event.target.value)}>{PROPERTY_TYPES.map((type) => <option key={type}>{type}</option>)}</select></Field>
-        <Field label="العملية"><select value={form.operation} onChange={(event) => set('operation', event.target.value)}>{OPERATIONS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></Field>
+        {forSale ? null : <Field label="العملية"><select value={form.operation} onChange={(event) => set('operation', event.target.value)}>{OPERATIONS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></Field>}
         <Field label="المنطقة"><select value={form.areaId} onChange={(event) => set('areaId', event.target.value)} required><option value="">اختر</option>{areas.map((area) => <option key={area.id} value={area.id}>{area.name}</option>)}</select></Field>
-        <Field label="المشروع"><select value={form.projectId} onChange={(event) => { const project = projects.find((item) => item.id === event.target.value); setForm((current) => ({ ...current, projectId: event.target.value, areaId: project?.areaId || current.areaId })) }}><option value="">بدون مشروع</option>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select></Field>
+        {forSale || !projects.length ? null : <Field label="المشروع"><select value={form.projectId} onChange={(event) => { const project = projects.find((item) => item.id === event.target.value); setForm((current) => ({ ...current, projectId: event.target.value, areaId: project?.areaId || current.areaId })) }}><option value="">بدون مشروع</option>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select></Field>}
         <Field label="العنوان" wide><input value={form.address || ''} onChange={(event) => set('address', event.target.value)} /></Field>
         <Field label="الوصف" wide><textarea value={form.description || ''} onChange={(event) => set('description', event.target.value)} /></Field>
         <Field label="السعر بالجنيه"><input className="num" value={form.price} onChange={(event) => set('price', event.target.value)} /></Field>
@@ -101,14 +106,14 @@ export default function ListingsAdmin() {
         <label className="check"><input type="checkbox" checked={form.isOffer} onChange={(event) => set('isOffer', event.target.checked)} /> ضمن العروض</label>
         <label className="check"><input type="checkbox" checked={form.isSample} onChange={(event) => set('isSample', event.target.checked)} /> تجريبي</label>
         <div className="actions wide">
-          <button className="btn btn-primary" type="submit">{form.id ? 'حفظ التعديل' : 'إضافة إعلان'}</button>
-          {form.id ? <button className="btn btn-line" type="button" onClick={() => setForm(empty)}>إلغاء</button> : null}
+          <button className="btn btn-primary" type="submit">{form.id ? 'حفظ التعديل' : forSale ? 'إضافة عقار' : 'إضافة إعلان'}</button>
+          {form.id ? <button className="btn btn-line" type="button" onClick={() => setForm(blank)}>إلغاء</button> : null}
         </div>
       </form>
       {error ? <p className="msg-err">{error}</p> : null}
       <div className="panel table-wrap">
         <table>
-          <thead><tr><th>الإعلان</th><th>النوع</th><th>السعر</th><th>الحالة</th><th></th></tr></thead>
+          <thead><tr><th>{forSale ? 'العقار' : 'الإعلان'}</th><th>النوع</th><th>السعر</th><th>الحالة</th><th></th></tr></thead>
           <tbody>
             {items.map((item) => (
               <tr key={item.id}>

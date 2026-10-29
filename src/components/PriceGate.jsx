@@ -66,7 +66,7 @@ export function PriceNotice() {
         </span>
         <p className="notice-kicker">حصري للأعضاء</p>
         <h2 id="price-notice-title">سجّل مجاناً لعرض الأسعار</h2>
-        <p id="price-notice-text">أنشئ حسابك في بلو هوم خلال دقيقة واحدة، واطّلع على الأسعار الكاملة لكل الوحدات والمشاريع.</p>
+        <p id="price-notice-text">أنشئ حسابك في بلو هوم خلال دقيقة واحدة، واطّلع على الأسعار الكاملة لكل العقارات والوحدات.</p>
         <ul className="notice-perks">
           <li>أسعار كل الشقق والفلل والأراضي والمحلات</li>
           <li>تفاصيل المقدّم والأقساط وسعر المتر</li>

@@ -16,7 +16,7 @@ export default function Dashboard() {
   useEffect(load, [])
 
   async function removeSamples() {
-    if (!window.confirm('حذف كل المشاريع والإعلانات التجريبية؟')) return
+    if (!window.confirm('حذف كل البيانات التجريبية؟')) return
     await api.deleteSamples()
     load()
   }
@@ -28,7 +28,7 @@ export default function Dashboard() {
         <div><p className="kicker">بلو هوم</p><h1>إدارة العقارات</h1></div>
         <div className="actions">
           <Link className="btn btn-primary" to="/admin/listings">إضافة إعلان</Link>
-          <Link className="btn btn-line" to="/admin/projects">إضافة مشروع</Link>
+          <Link className="btn btn-line" to="/admin/properties">إضافة عقار للبيع</Link>
         </div>
       </div>
       {error ? <p className="msg-err">{error}</p> : null}
@@ -36,7 +36,7 @@ export default function Dashboard() {
         <div className="stats">
           <article className="stat"><b>{data.available}</b><span>وحدة متاحة</span></article>
           <article className="stat"><b>{data.lands}</b><span>أرض متاحة</span></article>
-          <article className="stat"><b>{data.projects}</b><span>مشروع</span></article>
+          <article className="stat"><b>{data.properties ?? 0}</b><span>عقار للبيع</span></article>
           <article className="stat"><b>{data.unread}</b><span>طلب غير مقروء</span></article>
         </div>
       ) : null}

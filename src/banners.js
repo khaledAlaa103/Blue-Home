@@ -1,6 +1,6 @@
 // Photo behind each section's page banner (Unsplash, like the rest of the site's sample imagery).
 const PHOTOS = {
-  projects: 'photo-1486406146926-c627a92ad1ab',
+  properties: 'photo-1486406146926-c627a92ad1ab',
   units: 'photo-1600607687939-ce8a6c25118c',
   lands: 'photo-1500382017468-9049fed747ef',
   all: 'photo-1613490493576-7fde63acd811',
