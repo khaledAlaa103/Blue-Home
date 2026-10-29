@@ -65,42 +65,89 @@ function Header({ open, setOpen }) {
   )
 }
 
+const FOOT_ICONS = {
+  phone: <path d="M5 4h3.5l1.5 4.5-2.2 1.4a11 11 0 0 0 6.3 6.3l1.4-2.2L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16 16 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4Z" />,
+  whatsapp: <><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7Z" /><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-1.8-1.8l.8-1-1-2Z" /></>,
+  mail: <><rect x="3.5" y="5.5" width="17" height="13" rx="2" /><path d="m4 7 8 6 8-6" /></>,
+  pin: <><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" /><circle cx="12" cy="10" r="2.3" /></>,
+  facebook: <path d="M14 8h2.5V4.5H14A3.5 3.5 0 0 0 10.5 8v2.5H8V14h2.5v6.5H14V14h2.5l.5-3.5h-3V8.5a.5.5 0 0 1 .5-.5Z" />,
+  instagram: <><rect x="4" y="4" width="16" height="16" rx="4.5" /><circle cx="12" cy="12" r="3.6" /><circle cx="16.8" cy="7.2" r="0.6" /></>,
+  youtube: <><rect x="3" y="6" width="18" height="12" rx="3.5" /><path d="m10.5 9.5 4 2.5-4 2.5Z" /></>,
+}
+
+function FootIcon({ name }) {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{FOOT_ICONS[name]}</svg>
+}
+
 function Footer({ site }) {
   const settings = site?.settings || {}
   const { phone, whatsapp } = contactNumbers(settings)
-  const areaNames = arabicList((site?.areas || []).map((area) => area.name))
+  const areas = site?.areas || []
+  const areaNames = arabicList(areas.map((area) => area.name))
   const year = new Date().getFullYear()
+  const waHref = whatsapp ? waLink(whatsapp, 'مرحباً، أود الاستفسار عن عروض بلو هوم.') : ''
+  const social = [['facebook', 'فيسبوك'], ['instagram', 'إنستغرام'], ['youtube', 'يوتيوب']].filter(([key]) => settings[key])
   return (
     <footer className="footer">
-      <div className="container footer-grid">
-        <div>
-          <Logo />
-          <p className="quiet">عرض العقارات والوحدات والأراضي{areaNames ? ` في ${areaNames}` : ''}</p>
+      {phone || waHref ? (
+        <div className="container">
+          <div className="footer-cta">
+            <div>
+              <strong>بتدوّر على عقار مناسب؟</strong>
+              <p>فريق بلو هوم يساعدك تختار الوحدة الصح بالسعر ونظام السداد اللي يناسبك.</p>
+            </div>
+            <div className="footer-cta-actions">
+              {phone ? <a className="btn footer-btn-light" href={telLink(phone)}><FootIcon name="phone" />اتصل بنا</a> : null}
+              {waHref ? <a className="btn footer-btn-wa" href={waHref} target="_blank" rel="noreferrer"><FootIcon name="whatsapp" />واتساب</a> : null}
+            </div>
+          </div>
         </div>
-        <div>
-          <strong>الصفحات</strong>
+      ) : null}
+      <div className="container footer-grid">
+        <div className="footer-brand">
+          <Link to="/" aria-label="بلو هوم"><Logo /></Link>
+          <p>شقق وفلل وأراضٍ ومحلات للبيع{areaNames ? ` في ${areaNames}` : ''}، بأسعار واضحة ونظام سداد يناسبك.</p>
+          {social.length ? (
+            <div className="footer-social">
+              {social.map(([key, label]) => <a key={key} href={settings[key]} target="_blank" rel="noreferrer" aria-label={label} title={label}><FootIcon name={key} /></a>)}
+            </div>
+          ) : null}
+        </div>
+        <nav className="footer-col" aria-label="روابط سريعة">
+          <strong>روابط سريعة</strong>
           <Link to="/properties">العقارات</Link>
           <Link to="/units">الوحدات</Link>
           <Link to="/lands">الأراضي</Link>
+          <Link to="/search?offers=1">العروض</Link>
           <Link to="/search">بحث متقدم</Link>
-        </div>
-        <div>
-          <strong>المناطق</strong>
-          {(site?.areas || []).map((area) => <Link key={area.id} to={`/search?areaId=${area.id}`}>{area.name}</Link>)}
-        </div>
-        <div>
-          <strong>التواصل</strong>
-          {phone ? <a href={telLink(phone)}>اتصال: <bdi dir="ltr">{phone}</bdi></a> : null}
-          {whatsapp ? <a href={waLink(whatsapp, 'مرحباً، أود الاستفسار عن عروض بلو هوم.')} target="_blank" rel="noreferrer">واتساب</a> : null}
-          {settings.email ? <a href={`mailto:${settings.email}`}>{settings.email}</a> : null}
-          {settings.address ? <span>{settings.address}</span> : null}
-          {settings.facebook ? <a href={settings.facebook} target="_blank" rel="noreferrer">فيسبوك</a> : null}
-          {settings.instagram ? <a href={settings.instagram} target="_blank" rel="noreferrer">إنستغرام</a> : null}
-          {settings.youtube ? <a href={settings.youtube} target="_blank" rel="noreferrer">يوتيوب</a> : null}
+        </nav>
+        <nav className="footer-col" aria-label="الشركة">
+          <strong>الشركة</strong>
+          <Link to="/about">من نحن</Link>
           <Link to="/contact">تواصل معنا</Link>
+          <Link to="/signup">إنشاء حساب</Link>
+          <Link to="/login">تسجيل الدخول</Link>
+        </nav>
+        {areas.length ? (
+          <nav className="footer-col footer-areas" aria-label="المناطق">
+            <strong>المناطق</strong>
+            {areas.map((area) => <Link key={area.id} to={`/search?areaId=${area.id}`}>{area.name}</Link>)}
+          </nav>
+        ) : null}
+        {phone || waHref || settings.email || settings.address ? <div className="footer-col footer-contact">
+          <strong>تواصل معنا</strong>
+          {phone ? <a href={telLink(phone)}><FootIcon name="phone" /><bdi dir="ltr">{phone}</bdi></a> : null}
+          {waHref ? <a href={waHref} target="_blank" rel="noreferrer"><FootIcon name="whatsapp" />واتساب</a> : null}
+          {settings.email ? <a href={`mailto:${settings.email}`}><FootIcon name="mail" /><bdi dir="ltr">{settings.email}</bdi></a> : null}
+          {settings.address ? <span><FootIcon name="pin" />{settings.address}</span> : null}
+        </div> : null}
+      </div>
+      <div className="footer-bottom">
+        <div className="container">
+          <span>© {year} بلو هوم <span lang="en">Blue Home</span>. جميع الحقوق محفوظة.</span>
+          <span lang="en" dir="ltr">bluehome7.store</span>
         </div>
       </div>
-      <div className="container legal">© {year} بلو هوم</div>
     </footer>
   )
 }
