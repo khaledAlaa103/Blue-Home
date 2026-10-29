@@ -523,7 +523,9 @@ a.contact-row:hover { background: #f8faff; }
 .bh-pin-head svg { width: 20px; height: 20px; transform: rotate(45deg); }
 .bh-pin:hover .bh-pin-head { background: linear-gradient(135deg, #2563eb, #1e3a8a); }
 
-.detail { display: grid; gap: 16px; }
+/* minmax(0, …) and min-width: 0 stop a long thumbnail row from widening the page past the phone screen. */
+.detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.detail-main, .facts { min-width: 0; }
 .gallery-main { width: 100%; border-radius: 20px; aspect-ratio: 16/10; background: #e8edf3; border: 0; padding: 0; display: block; overflow: hidden; }
 .gallery-main .ph { width: 100%; height: 100%; }
 /* Uploaded photos come in any shape: show all of it, and fill the spare space with a blurred copy. */
