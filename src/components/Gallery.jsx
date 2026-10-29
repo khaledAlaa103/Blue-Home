@@ -54,6 +54,18 @@ export function Gallery({ images = [], title, type }) {
   }, [active, images.length])
   // Keep the chosen thumbnail in view when swiping through the main photo.
   const thumbs = useRef(null)
+  // Shape the frame like the cover photo (portrait phone shots get a tall frame), within limits.
+  const [ratio, setRatio] = useState(null)
+  const cover = images[0]
+  useEffect(() => {
+    setRatio(null)
+    if (!cover) return undefined
+    let live = true
+    const probe = new Image()
+    probe.onload = () => { if (live && probe.naturalHeight) setRatio(Math.min(1.78, Math.max(0.75, probe.naturalWidth / probe.naturalHeight))) }
+    probe.src = cover
+    return () => { live = false }
+  }, [cover])
   useEffect(() => {
     const row = thumbs.current
     const thumb = row?.children[current]
@@ -68,7 +80,7 @@ export function Gallery({ images = [], title, type }) {
   const shown = images[current] || images[0]
   return (
     <div>
-      <button className="gallery-main" type="button" onClick={() => { if (!mainSwipe.swiped()) setActive(current) }} onTouchStart={mainSwipe.onTouchStart} onTouchEnd={mainSwipe.onTouchEnd}>
+      <button className="gallery-main" type="button" style={ratio ? { '--ratio': ratio } : undefined} onClick={() => { if (!mainSwipe.swiped()) setActive(current) }} onTouchStart={mainSwipe.onTouchStart} onTouchEnd={mainSwipe.onTouchEnd}>
         <Cover src={shown} alt={`${title} - صورة ${current + 1}`} whole />
         {images.length > 1 ? <span className="gallery-count">{current + 1} / {images.length}</span> : null}
       </button>

@@ -60,7 +60,7 @@ export default function PropertyDetail() {
   const map = coordsOf(item.lat, item.lng)
   const video = embed
     ? <iframe className="video" src={embed} title="فيديو العقار" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-    : file ? <video className="video" src={file} controls playsInline preload="metadata" /> : null
+    : file ? <video className="video" src={file} controls playsInline preload="metadata" onLoadedMetadata={(event) => event.currentTarget.setAttribute('data-sized', '')} /> : null
   const videoFirst = Boolean(video) && !item.images?.length
   return (
     <div className="container">
