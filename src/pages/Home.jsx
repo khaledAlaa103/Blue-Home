@@ -14,7 +14,7 @@ const LOOKING = [
   ['أراضي', 'أرض'],
   ['محلات', 'محل تجاري'],
   ['إداري', 'إداري'],
-  ['عروض', 'offers'],
+  ['فنادق', 'فندق'],
 ]
 
 const PRICES = [
@@ -100,7 +100,7 @@ export default function Home() {
         <div className="section-head"><div><p className="kicker">اختصارات</p><h2>بتدور على إيه؟</h2></div></div>
         <div className="look-grid">
           {LOOKING.map(([label, value]) => (
-            <Link key={label} className="look" to={value === 'offers' ? '/search?offers=1' : value === 'أرض' ? '/lands' : `/search?type=${encodeURIComponent(value)}`}>
+            <Link key={label} className="look" to={value === 'أرض' ? '/lands' : `/search?type=${encodeURIComponent(value)}`}>
               <span>{label}</span>
             </Link>
           ))}

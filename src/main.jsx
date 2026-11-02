@@ -17,7 +17,13 @@ createRoot(document.getElementById('root')).render(
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, { updateViaCache: 'none' })
-      .then((registration) => registration.update())
+      .then((registration) => {
+        registration.update()
+        // Phones resume the app instead of reopening it; look for a new deploy each time it comes back.
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') registration.update().catch(() => {})
+        })
+      })
       .catch(() => {})
   })
   // A new deploy ships a new worker; reload once so the open app shows it.

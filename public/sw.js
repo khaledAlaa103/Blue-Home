@@ -1,6 +1,8 @@
 // Pages: network first, cached copy when offline. Hashed build files: cache first.
 // The API, uploads and admin are never cached so listings and logins stay fresh.
-const CACHE = 'blue-home-v3'
+// The build replaces the name below with a new stamp each time, so each deploy ships a changed worker
+// and installed apps pick up the new version.
+const CACHE = 'blue-home-__BUILD__'
 
 self.addEventListener('install', () => self.skipWaiting())
 
