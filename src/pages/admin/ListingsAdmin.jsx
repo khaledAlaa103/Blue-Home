@@ -5,6 +5,8 @@ import { formatPrice, statusLabel, useTitle } from '../../format'
 import { HOTEL_STATES, HOTEL_TYPE, OPERATIONS, PAYMENTS, PROPERTY_TYPES, ROOM_TYPES, STATUSES } from '../../../shared/constants.js'
 import { emptyToNull, Field, ImagesField, LocationField, VideoField } from './ui'
 
+const OTHER = '__other'
+
 const empty = { title: '', description: '', type: 'شقة', operation: 'sale', areaId: '', projectId: '', address: '', price: '', areaSqm: '', rooms: '', baths: '', paymentType: 'cash', downPayment: '', installmentAmount: '', installmentMonths: '', paymentNote: '', status: 'available', lat: '', lng: '', videoUrl: '', virtualTourUrl: '', featuresText: '', images: [], published: true, featured: false, isOffer: false, isSample: false, floorsCount: '', stars: '', hotelRooms: '', hotelState: '', licensed: false }
 
 export default function ListingsAdmin() {
@@ -25,6 +27,8 @@ export default function ListingsAdmin() {
   function set(key, value) { setForm((current) => ({ ...current, [key]: value })) }
   const showRooms = ROOM_TYPES.includes(form.type)
   const hotel = form.type === HOTEL_TYPE
+  // Any type outside the list is typed in by hand under «أخرى».
+  const otherType = !PROPERTY_TYPES.includes(form.type)
 
   function edit(item) {
     setForm({
@@ -84,7 +88,13 @@ export default function ListingsAdmin() {
       <h1>الإعلانات</h1>
       <form className="panel form-grid" onSubmit={save}>
         <Field label={hotel ? 'عنوان إعلان الفندق' : 'عنوان الإعلان'} wide><input value={form.title} onChange={(event) => set('title', event.target.value)} placeholder={hotel ? 'مثال: فندق 4 نجوم للبيع في الشيخ زايد' : ''} required /></Field>
-        <Field label="نوع العقار"><select value={form.type} onChange={(event) => set('type', event.target.value)}>{PROPERTY_TYPES.map((type) => <option key={type}>{type}</option>)}</select></Field>
+        <Field label="نوع العقار">
+          <select value={otherType ? OTHER : form.type} onChange={(event) => set('type', event.target.value === OTHER ? '' : event.target.value)}>
+            {PROPERTY_TYPES.map((type) => <option key={type}>{type}</option>)}
+            <option value={OTHER}>أخرى (اكتبه بنفسك)</option>
+          </select>
+        </Field>
+        {otherType ? <Field label="اكتب نوع العقار"><input value={form.type} onChange={(event) => set('type', event.target.value)} placeholder="مثال: مصنع، مخزن، مستشفى، مدرسة" maxLength={40} required autoFocus /></Field> : null}
         <Field label="العملية"><select value={form.operation} onChange={(event) => set('operation', event.target.value)}>{OPERATIONS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></Field>
         <Field label="المنطقة"><select value={form.areaId} onChange={(event) => set('areaId', event.target.value)} required><option value="">اختر</option>{areas.map((area) => <option key={area.id} value={area.id}>{area.name}</option>)}</select></Field>
         {projects.length ? <Field label="المشروع"><select value={form.projectId} onChange={(event) => { const project = projects.find((item) => item.id === event.target.value); setForm((current) => ({ ...current, projectId: event.target.value, areaId: project?.areaId || current.areaId })) }}><option value="">بدون مشروع</option>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select></Field> : null}

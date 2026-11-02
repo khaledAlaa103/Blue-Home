@@ -183,7 +183,11 @@ export function parseListing(body, db, current) {
   }
   const title = requiredText(merged.title, 'عنوان الإعلان', 140)
   if (title.error) return title
-  if (!section && !PROPERTY_TYPES.includes(merged.type)) return fail('نوع العقار غير صالح')
+  if (!section && !PROPERTY_TYPES.includes(merged.type)) {
+    // «أخرى»: any other type the owner types in (مصنع، مخزن، مستشفى…).
+    merged.type = text(merged.type, 40)
+    if (!merged.type) return fail('اكتب نوع العقار')
+  }
   if (!OPS.has(merged.operation)) return fail('نوع العملية غير صالح')
   if (!PAY.has(merged.paymentType)) return fail('نظام السداد غير صالح')
   if (!STATUS.has(merged.status)) return fail('حالة العقار غير صالحة')
