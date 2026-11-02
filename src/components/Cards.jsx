@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { directVideo, formatNumber, formatPrice, statusLabel, videoEmbed } from '../format'
+import { starsLabel } from '../../shared/constants.js'
 import { Price } from './PriceGate'
 
 const ICONS = {
@@ -8,12 +9,14 @@ const ICONS = {
   building: <><path d="M5 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16" /><path d="M15 10h3a1 1 0 0 1 1 1v10" /><path d="M3 21h18" /><path d="M8 8h1M11 8h1M8 12h1M11 12h1M8 16h1M11 16h1" /></>,
   shop: <><path d="M4 10v10h16V10" /><path d="M3 10l2-6h14l2 6Z" /><path d="M3 10a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0" /><path d="M10 20v-5h4v5" /></>,
   house: <><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 9.5V20h13V9.5" /><path d="M10 20v-5.5h4V20" /></>,
+  hotel: <><path d="M4 21V7l8-4 8 4v14" /><path d="M3 21h18" /><path d="M9 21v-4h6v4" /><path d="M8 10h1M11.5 10h1M15 10h1M8 13.5h1M11.5 13.5h1M15 13.5h1" /></>,
 }
 
 function iconOf(type) {
   if (type === 'أرض') return ICONS.land
   if (type === 'شقة' || type === 'إداري' || type === 'عقار') return ICONS.building
   if (type === 'محل تجاري') return ICONS.shop
+  if (type === 'فندق') return ICONS.hotel
   return ICONS.house
 }
 
@@ -86,6 +89,8 @@ export function ListingCard({ item }) {
           {item.areaSqm ? <li>{formatNumber(item.areaSqm)} م²</li> : null}
           {item.floorsCount ? <li>{countLabel(item.floorsCount, 'دور', 'أدوار')}</li> : null}
           {item.unitsCount ? <li>{countLabel(item.unitsCount, 'وحدة', 'وحدات')}</li> : null}
+          {item.stars ? <li>{starsLabel(item.stars)}</li> : null}
+          {item.hotelRooms ? <li>{countLabel(item.hotelRooms, 'غرفة', 'غرف')}</li> : null}
           {item.rooms ? <li>{item.rooms} غرف</li> : null}
           {item.baths ? <li>{item.baths} حمام</li> : null}
         </ul>

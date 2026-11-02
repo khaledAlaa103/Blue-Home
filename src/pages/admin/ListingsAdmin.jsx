@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api'
 import { formatPrice, statusLabel, useTitle } from '../../format'
-import { OPERATIONS, PAYMENTS, PROPERTY_TYPES, ROOM_TYPES, STATUSES } from '../../../shared/constants.js'
+import { HOTEL_STATES, HOTEL_TYPE, OPERATIONS, PAYMENTS, PROPERTY_TYPES, ROOM_TYPES, STATUSES } from '../../../shared/constants.js'
 import { emptyToNull, Field, ImagesField, LocationField, VideoField } from './ui'
 
-const empty = { title: '', description: '', type: 'شقة', operation: 'sale', areaId: '', projectId: '', address: '', price: '', areaSqm: '', rooms: '', baths: '', paymentType: 'cash', downPayment: '', installmentAmount: '', installmentMonths: '', paymentNote: '', status: 'available', lat: '', lng: '', videoUrl: '', virtualTourUrl: '', featuresText: '', images: [], published: true, featured: false, isOffer: false, isSample: false }
+const empty = { title: '', description: '', type: 'شقة', operation: 'sale', areaId: '', projectId: '', address: '', price: '', areaSqm: '', rooms: '', baths: '', paymentType: 'cash', downPayment: '', installmentAmount: '', installmentMonths: '', paymentNote: '', status: 'available', lat: '', lng: '', videoUrl: '', virtualTourUrl: '', featuresText: '', images: [], published: true, featured: false, isOffer: false, isSample: false, floorsCount: '', stars: '', hotelRooms: '', hotelState: '', licensed: false }
 
 export default function ListingsAdmin() {
   useTitle('إدارة الإعلانات')
@@ -24,6 +24,7 @@ export default function ListingsAdmin() {
   useEffect(load, [])
   function set(key, value) { setForm((current) => ({ ...current, [key]: value })) }
   const showRooms = ROOM_TYPES.includes(form.type)
+  const hotel = form.type === HOTEL_TYPE
 
   function edit(item) {
     setForm({
@@ -33,6 +34,9 @@ export default function ListingsAdmin() {
       areaSqm: item.areaSqm ?? '',
       rooms: item.rooms ?? '',
       baths: item.baths ?? '',
+      floorsCount: item.floorsCount ?? '',
+      stars: item.stars ?? '',
+      hotelRooms: item.hotelRooms ?? '',
       downPayment: item.downPayment ?? '',
       installmentAmount: item.installmentAmount ?? '',
       installmentMonths: item.installmentMonths ?? '',
@@ -53,6 +57,9 @@ export default function ListingsAdmin() {
       areaSqm: emptyToNull(form.areaSqm),
       rooms: emptyToNull(form.rooms),
       baths: emptyToNull(form.baths),
+      floorsCount: emptyToNull(form.floorsCount),
+      stars: emptyToNull(form.stars),
+      hotelRooms: emptyToNull(form.hotelRooms),
       downPayment: emptyToNull(form.downPayment),
       installmentAmount: emptyToNull(form.installmentAmount),
       installmentMonths: emptyToNull(form.installmentMonths),
@@ -76,17 +83,29 @@ export default function ListingsAdmin() {
     <>
       <h1>الإعلانات</h1>
       <form className="panel form-grid" onSubmit={save}>
-        <Field label="عنوان الإعلان" wide><input value={form.title} onChange={(event) => set('title', event.target.value)} required /></Field>
+        <Field label={hotel ? 'عنوان إعلان الفندق' : 'عنوان الإعلان'} wide><input value={form.title} onChange={(event) => set('title', event.target.value)} placeholder={hotel ? 'مثال: فندق 4 نجوم للبيع في الشيخ زايد' : ''} required /></Field>
         <Field label="نوع العقار"><select value={form.type} onChange={(event) => set('type', event.target.value)}>{PROPERTY_TYPES.map((type) => <option key={type}>{type}</option>)}</select></Field>
         <Field label="العملية"><select value={form.operation} onChange={(event) => set('operation', event.target.value)}>{OPERATIONS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></Field>
         <Field label="المنطقة"><select value={form.areaId} onChange={(event) => set('areaId', event.target.value)} required><option value="">اختر</option>{areas.map((area) => <option key={area.id} value={area.id}>{area.name}</option>)}</select></Field>
         {projects.length ? <Field label="المشروع"><select value={form.projectId} onChange={(event) => { const project = projects.find((item) => item.id === event.target.value); setForm((current) => ({ ...current, projectId: event.target.value, areaId: project?.areaId || current.areaId })) }}><option value="">بدون مشروع</option>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select></Field> : null}
         <Field label="العنوان" wide><input value={form.address || ''} onChange={(event) => set('address', event.target.value)} /></Field>
-        <Field label="الوصف" wide><textarea value={form.description || ''} onChange={(event) => set('description', event.target.value)} /></Field>
-        <Field label="السعر بالجنيه"><input className="num" value={form.price} onChange={(event) => set('price', event.target.value)} /></Field>
-        <Field label="المساحة م²"><input className="num" value={form.areaSqm} onChange={(event) => set('areaSqm', event.target.value)} /></Field>
+        <Field label={hotel ? 'وصف الفندق' : 'الوصف'} wide><textarea value={form.description || ''} onChange={(event) => set('description', event.target.value)} placeholder={hotel ? 'الموقع والإطلالة، نسبة الإشغال، المطاعم والقاعات، حالة المبنى والفرش…' : ''} /></Field>
+        <Field label={hotel ? 'سعر بيع الفندق بالجنيه' : 'السعر بالجنيه'}><input className="num" value={form.price} onChange={(event) => set('price', event.target.value)} /></Field>
+        <Field label={hotel ? 'مساحة الأرض م²' : 'المساحة م²'}><input className="num" value={form.areaSqm} onChange={(event) => set('areaSqm', event.target.value)} /></Field>
         {showRooms ? <Field label="الغرف"><input className="num" value={form.rooms} onChange={(event) => set('rooms', event.target.value)} /></Field> : null}
         {showRooms ? <Field label="الحمامات"><input className="num" value={form.baths} onChange={(event) => set('baths', event.target.value)} /></Field> : null}
+        {hotel ? (
+          <fieldset className="sale-section wide">
+            <legend>بيانات الفندق</legend>
+            <div className="form-grid">
+              <Field label="التصنيف"><select value={form.stars || ''} onChange={(event) => set('stars', event.target.value)}><option value="">غير مصنّف</option>{[1, 2, 3, 4, 5, 6, 7].map((count) => <option key={count} value={count}>{'★'.repeat(count)} ({count})</option>)}</select></Field>
+              <Field label="عدد الغرف الفندقية"><input className="num" inputMode="numeric" value={form.hotelRooms} onChange={(event) => set('hotelRooms', event.target.value)} placeholder="مثال: 120" /></Field>
+              <Field label="عدد الأدوار"><input className="num" inputMode="numeric" value={form.floorsCount} onChange={(event) => set('floorsCount', event.target.value)} placeholder="مثال: 8" /></Field>
+              <Field label="حالة التشغيل"><select value={form.hotelState || ''} onChange={(event) => set('hotelState', event.target.value)}><option value="">غير محدد</option>{HOTEL_STATES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></Field>
+              <label className="check wide"><input type="checkbox" checked={Boolean(form.licensed)} onChange={(event) => set('licensed', event.target.checked)} /> مرخّص سياحيًا</label>
+            </div>
+          </fieldset>
+        ) : null}
         <Field label="نظام السداد"><select value={form.paymentType} onChange={(event) => set('paymentType', event.target.value)}>{PAYMENTS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></Field>
         <Field label="الحالة"><select value={form.status} onChange={(event) => set('status', event.target.value)}>{STATUSES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></Field>
         <Field label="المقدم"><input className="num" value={form.downPayment} onChange={(event) => set('downPayment', event.target.value)} /></Field>
@@ -96,14 +115,14 @@ export default function ListingsAdmin() {
         <LocationField lat={form.lat} lng={form.lng} label={form.type} onChange={(lat, lng) => { set('lat', lat); set('lng', lng) }} />
         <VideoField value={form.videoUrl || ''} onChange={(url) => set('videoUrl', url)} />
         <Field label="جولة افتراضية"><input value={form.virtualTourUrl || ''} onChange={(event) => set('virtualTourUrl', event.target.value)} /></Field>
-        <Field label="المميزات، سطر لكل ميزة" wide><textarea value={form.featuresText || ''} onChange={(event) => set('featuresText', event.target.value)} /></Field>
+        <Field label={hotel ? 'المرافق والخدمات، سطر لكل ميزة' : 'المميزات، سطر لكل ميزة'} wide><textarea value={form.featuresText || ''} onChange={(event) => set('featuresText', event.target.value)} placeholder={hotel ? 'مطعم وكافيه\nحمام سباحة\nقاعة مؤتمرات\nجراج' : ''} /></Field>
         <ImagesField images={form.images || []} onChange={(images) => set('images', images)} />
         <label className="check"><input type="checkbox" checked={form.published} onChange={(event) => set('published', event.target.checked)} /> ظاهر</label>
         <label className="check"><input type="checkbox" checked={form.featured} onChange={(event) => set('featured', event.target.checked)} /> مميز</label>
         <label className="check"><input type="checkbox" checked={form.isOffer} onChange={(event) => set('isOffer', event.target.checked)} /> ضمن العروض</label>
         <label className="check"><input type="checkbox" checked={form.isSample} onChange={(event) => set('isSample', event.target.checked)} /> تجريبي</label>
         <div className="actions wide">
-          <button className="btn btn-primary" type="submit">{form.id ? 'حفظ التعديل' : 'إضافة إعلان'}</button>
+          <button className="btn btn-primary" type="submit">{form.id ? 'حفظ التعديل' : hotel ? 'إضافة إعلان الفندق' : 'إضافة إعلان'}</button>
           {form.id ? <button className="btn btn-line" type="button" onClick={() => setForm(empty)}>إلغاء</button> : null}
         </div>
       </form>

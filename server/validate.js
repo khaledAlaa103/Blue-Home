@@ -1,4 +1,4 @@
-import { PROPERTY_TYPES, ROOM_TYPES, OPERATIONS, PAYMENTS, STATUSES, REQUEST_TYPES, FINISHINGS, DELIVERIES, LEGAL_STATES, FLOOR_TYPES, BUILDING_TYPE, latinDigits } from '../shared/constants.js'
+import { PROPERTY_TYPES, ROOM_TYPES, OPERATIONS, PAYMENTS, STATUSES, REQUEST_TYPES, FINISHINGS, DELIVERIES, LEGAL_STATES, FLOOR_TYPES, BUILDING_TYPE, HOTEL_TYPE, HOTEL_STATES, latinDigits } from '../shared/constants.js'
 
 const ROOM = new Set(ROOM_TYPES)
 const OPS = new Set(OPERATIONS.map((item) => item.id))
@@ -8,6 +8,7 @@ const REQUESTS = new Set(REQUEST_TYPES.map((item) => item.id))
 const FINISH = new Set(FINISHINGS.map((item) => item.id))
 const DELIVERY = new Set(DELIVERIES.map((item) => item.id))
 const LEGAL = new Set(LEGAL_STATES.map((item) => item.id))
+const HOTEL_STATE = new Set(HOTEL_STATES.map((item) => item.id))
 
 function fail(error) {
   return { error }
@@ -91,7 +92,7 @@ function coord(value, min, max, label) {
 }
 
 const PROJECT_KEYS = ['name', 'developer', 'areaId', 'address', 'description', 'features', 'lat', 'lng', 'videoUrl', 'virtualTourUrl', 'images', 'published', 'featured', 'isSample']
-const LISTING_KEYS = ['title', 'description', 'type', 'operation', 'areaId', 'projectId', 'address', 'price', 'areaSqm', 'rooms', 'baths', 'paymentType', 'downPayment', 'installmentAmount', 'installmentMonths', 'paymentNote', 'status', 'lat', 'lng', 'videoUrl', 'virtualTourUrl', 'features', 'images', 'published', 'featured', 'isOffer', 'isSample', 'section', 'finishing', 'floor', 'delivery', 'deliveryNote', 'legal', 'negotiable', 'floorsCount', 'unitsCount']
+const LISTING_KEYS = ['title', 'description', 'type', 'operation', 'areaId', 'projectId', 'address', 'price', 'areaSqm', 'rooms', 'baths', 'paymentType', 'downPayment', 'installmentAmount', 'installmentMonths', 'paymentNote', 'status', 'lat', 'lng', 'videoUrl', 'virtualTourUrl', 'features', 'images', 'published', 'featured', 'isOffer', 'isSample', 'section', 'finishing', 'floor', 'delivery', 'deliveryNote', 'legal', 'negotiable', 'floorsCount', 'unitsCount', 'stars', 'hotelRooms', 'hotelState', 'licensed']
 
 export function parseProject(body, db, current) {
   const merged = {
@@ -197,7 +198,14 @@ export function parseListing(body, db, current) {
   if (price.error) return price
   const areaSqm = optionalNumber(merged.areaSqm, 'المساحة', { max: 10000000 })
   if (areaSqm.error) return areaSqm
-  const floorsCount = optionalNumber(section ? merged.floorsCount : null, 'عدد الأدوار', { integer: true, max: 100 })
+  const hotel = !section && merged.type === HOTEL_TYPE
+  const stars = optionalNumber(hotel ? merged.stars : null, 'التصنيف', { integer: true, max: 7 })
+  if (stars.error) return stars
+  if (stars.value === 0) return fail('التصنيف من نجمة لـ 7 نجوم')
+  const hotelRooms = optionalNumber(hotel ? merged.hotelRooms : null, 'عدد الغرف الفندقية', { integer: true, max: 5000 })
+  if (hotelRooms.error) return hotelRooms
+  if (hotel && merged.hotelState && !HOTEL_STATE.has(merged.hotelState)) return fail('حالة تشغيل الفندق غير صالحة')
+  const floorsCount = optionalNumber(section || hotel ? merged.floorsCount : null, 'عدد الأدوار', { integer: true, max: 100 })
   if (floorsCount.error) return floorsCount
   const unitsCount = optionalNumber(section ? merged.unitsCount : null, 'عدد الوحدات', { integer: true, max: 1000 })
   if (unitsCount.error) return unitsCount
@@ -267,6 +275,10 @@ export function parseListing(body, db, current) {
       negotiable: Boolean(merged.negotiable),
       floorsCount: floorsCount.value,
       unitsCount: unitsCount.value,
+      stars: stars.value,
+      hotelRooms: hotelRooms.value,
+      hotelState: hotel ? merged.hotelState || '' : '',
+      licensed: hotel && Boolean(merged.licensed),
       createdAt: current?.createdAt || now,
       updatedAt: now,
     },

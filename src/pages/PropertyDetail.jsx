@@ -6,7 +6,7 @@ import { Gallery } from '../components/Gallery'
 import { InquiryForm } from '../components/InquiryForm'
 import { Price } from '../components/PriceGate'
 import { PropertyMap } from '../components/PropertyMap'
-import { DELIVERIES, FINISHINGS, LEGAL_STATES, labelOf } from '../../shared/constants.js'
+import { DELIVERIES, FINISHINGS, HOTEL_STATES, HOTEL_TYPE, LEGAL_STATES, labelOf, starsLabel } from '../../shared/constants.js'
 import { contactNumbers, directVideo, formatDate, formatNumber, formatPrice, coordsOf, mapLink, operationLabel, paymentLabel, statusLabel, telLink, useTitle, videoEmbed, waLink } from '../format'
 
 export default function PropertyDetail() {
@@ -37,7 +37,11 @@ export default function PropertyDetail() {
     ['العملية', operationLabel(item.operation)],
     ['المنطقة', item.areaName],
     ['العنوان', item.address],
-    [item.section === 'properties' ? 'مساحة الأرض' : 'المساحة', item.areaSqm ? `${formatNumber(item.areaSqm)} م²` : ''],
+    [item.section === 'properties' || item.type === HOTEL_TYPE ? 'مساحة الأرض' : 'المساحة', item.areaSqm ? `${formatNumber(item.areaSqm)} م²` : ''],
+    ['التصنيف', starsLabel(item.stars)],
+    ['عدد الغرف الفندقية', item.hotelRooms || ''],
+    ['حالة التشغيل', labelOf(HOTEL_STATES, item.hotelState)],
+    ['الترخيص السياحي', item.licensed ? 'مرخّص' : ''],
     ['عدد الأدوار', item.floorsCount || ''],
     ['عدد الوحدات', item.unitsCount || ''],
     ['الغرف', item.rooms || ''],

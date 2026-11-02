@@ -1,4 +1,17 @@
-export const PROPERTY_TYPES = ['شقة', 'فيلا', 'تاون هاوس', 'توين هاوس', 'أرض', 'محل تجاري', 'إداري']
+export const PROPERTY_TYPES = ['شقة', 'فيلا', 'تاون هاوس', 'توين هاوس', 'أرض', 'محل تجاري', 'إداري', 'فندق']
+// A hotel listing swaps rooms/baths for hotel details: stars, hotel rooms, floors, operating state, tourism licence.
+export const HOTEL_TYPE = 'فندق'
+export const HOTEL_STATES = [
+  { id: 'operating', label: 'شغّال حاليًا' },
+  { id: 'closed', label: 'متوقف عن التشغيل' },
+  { id: 'construction', label: 'تحت الإنشاء' },
+]
+export function starsLabel(count) {
+  if (!count) return ''
+  if (count === 1) return 'نجمة واحدة'
+  if (count === 2) return 'نجمتان'
+  return `${count} نجوم`
+}
 export const ROOM_TYPES = ['شقة', 'فيلا', 'تاون هاوس', 'توين هاوس']
 export const OPERATIONS = [
   { id: 'sale', label: 'بيع' },
