@@ -1195,3 +1195,10 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
   html { scroll-behavior: auto; }
   * { transition: none !important; animation: none !important; }
 }
+
+/* Language switch (عربي / EN) */
+.lang-toggle { min-width: 44px; height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid #c5cedb; background: #fff; color: #10243e; font: inherit; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+.lang-toggle:hover { border-color: #1d4ed8; color: #1d4ed8; }
+html[dir="ltr"] .logo strong { text-align: left; }
+html[dir="ltr"] .num { text-align: left; }
+@media (max-width: 860px) { .topbar .lang-toggle { margin-inline-start: auto; } }

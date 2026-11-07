@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLang } from '../i18n'
 
 const DISMISS_KEY = 'bluehome_install_dismissed'
 
@@ -39,6 +40,7 @@ function ShareIcon() {
 }
 
 export function InstallPrompt() {
+  const { t, lang } = useLang()
   const [os] = useState(platform)
   const [canPrompt, setCanPrompt] = useState(() => Boolean(deferredPrompt))
   const [hidden, setHidden] = useState(() => {
@@ -71,18 +73,18 @@ export function InstallPrompt() {
     <div className="install-bar" role="dialog" aria-labelledby="install-title">
       <img src="/icons/icon-v2-192.png" alt="" className="install-icon" />
       <div className="install-text">
-        <strong id="install-title">نزّل أبلكيشن بلو هوم</strong>
+        <strong id="install-title">{t('نزّل أبلكيشن بلو هوم')}</strong>
         {os === 'ios' ? (
-          <span>دوس على <ShareIcon /> مشاركة، وبعدين «إضافة إلى الشاشة الرئيسية».</span>
+          lang === 'en' ? <span>Tap <ShareIcon /> Share, then “Add to Home Screen”.</span> : <span>دوس على <ShareIcon /> مشاركة، وبعدين «إضافة إلى الشاشة الرئيسية».</span>
         ) : canPrompt ? (
-          <span>افتح الموقع أسرع من أيقونة على الشاشة الرئيسية.</span>
+          <span>{t('افتح الموقع أسرع من أيقونة على الشاشة الرئيسية.')}</span>
         ) : (
-          <span>من قايمة المتصفح ⋮ اختار «تثبيت التطبيق» (مش «إضافة إلى الشاشة الرئيسية»).</span>
+          lang === 'en' ? <span>From the browser menu ⋮ choose “Install app” (not “Add to Home Screen”).</span> : <span>من قايمة المتصفح ⋮ اختار «تثبيت التطبيق» (مش «إضافة إلى الشاشة الرئيسية»).</span>
         )}
       </div>
       <div className="install-actions">
-        {os === 'android' && canPrompt ? <button type="button" className="btn btn-primary btn-sm" onClick={install}>تثبيت</button> : null}
-        <button type="button" className="install-close" aria-label="إغلاق" onClick={close}>×</button>
+        {os === 'android' && canPrompt ? <button type="button" className="btn btn-primary btn-sm" onClick={install}>{t('تثبيت')}</button> : null}
+        <button type="button" className="install-close" aria-label={t('إغلاق')} onClick={close}>×</button>
       </div>
     </div>
   )

@@ -5,6 +5,7 @@ import { arabicList, contactNumbers, telLink, useCanonical, waLink } from '../fo
 import { AccountMenu } from './AccountMenu'
 import { PriceNotice, useSignedIn } from './PriceGate'
 import { InstallPrompt } from './InstallPrompt'
+import { LangToggle, useLang } from '../i18n'
 
 const SiteContext = { current: null }
 export function useSite() {
@@ -38,27 +39,29 @@ export function Logo() {
 
 function Header({ open, setOpen }) {
   const signedIn = useSignedIn()
+  const { t } = useLang()
   return (
     <header className="header">
       <div className="container topbar">
-        <Link to="/" className="logo-link" aria-label="بلو هوم"><Logo /></Link>
-        <button className="nav-toggle" type="button" aria-label={open ? 'إغلاق القائمة' : 'فتح القائمة'} aria-expanded={open} aria-controls="site-nav" onClick={() => setOpen((value) => !value)}>
+        <Link to="/" className="logo-link" aria-label={t('بلو هوم')}><Logo /></Link>
+        <button className="nav-toggle" type="button" aria-label={open ? t('إغلاق القائمة') : t('فتح القائمة')} aria-expanded={open} aria-controls="site-nav" onClick={() => setOpen((value) => !value)}>
           <span className="nav-toggle-icon" aria-hidden="true"><span /><span /><span /></span>
         </button>
         <nav id="site-nav" className={open ? 'nav open' : 'nav'}>
-          <NavLink to="/" end>الرئيسية</NavLink>
-          <NavLink to="/properties">العقارات</NavLink>
-          <NavLink to="/units">الوحدات</NavLink>
-          <NavLink to="/lands">الأراضي</NavLink>
-          <NavLink to="/about">من نحن</NavLink>
-          <NavLink to="/contact">تواصل معنا</NavLink>
+          <NavLink to="/" end>{t('الرئيسية')}</NavLink>
+          <NavLink to="/properties">{t('العقارات')}</NavLink>
+          <NavLink to="/units">{t('الوحدات')}</NavLink>
+          <NavLink to="/lands">{t('الأراضي')}</NavLink>
+          <NavLink to="/about">{t('من نحن')}</NavLink>
+          <NavLink to="/contact">{t('تواصل معنا')}</NavLink>
           {signedIn ? null : (
             <div className="nav-auth">
-              <Link className="btn btn-line" to="/login">Login</Link>
-              <Link className="btn btn-primary" to="/signup">Sign up</Link>
+              <Link className="btn btn-line" to="/login">{t('تسجيل الدخول')}</Link>
+              <Link className="btn btn-primary" to="/signup">{t('إنشاء حساب')}</Link>
             </div>
           )}
         </nav>
+        <LangToggle />
         <AccountMenu />
       </div>
     </header>
@@ -80,71 +83,74 @@ function FootIcon({ name }) {
 }
 
 function Footer({ site }) {
+  const { t, lang } = useLang()
   const settings = site?.settings || {}
   const { phone, whatsapp } = contactNumbers(settings)
   const areas = site?.areas || []
-  const areaNames = arabicList(areas.map((area) => area.name))
+  const areaNames = lang === 'en' ? areas.map((area) => area.name).filter(Boolean).join(' & ') : arabicList(areas.map((area) => area.name))
   const year = new Date().getFullYear()
-  const waHref = whatsapp ? waLink(whatsapp, 'مرحباً، أود الاستفسار عن عروض بلو هوم.') : ''
-  const social = [['facebook', 'فيسبوك'], ['instagram', 'إنستغرام'], ['youtube', 'يوتيوب']].filter(([key]) => settings[key])
+  const waHref = whatsapp ? waLink(whatsapp, t('مرحباً، أود الاستفسار عن عروض بلو هوم.')) : ''
+  const social = [['facebook', t('فيسبوك')], ['instagram', t('إنستغرام')], ['youtube', t('يوتيوب')]].filter(([key]) => settings[key])
   return (
     <footer className="footer">
       {phone || waHref ? (
         <div className="container">
           <div className="footer-cta">
             <div>
-              <strong>بتدوّر على عقار مناسب؟</strong>
-              <p>فريق بلو هوم يساعدك تختار الوحدة الصح بالسعر ونظام السداد اللي يناسبك.</p>
+              <strong>{t('بتدوّر على عقار مناسب؟')}</strong>
+              <p>{t('فريق بلو هوم يساعدك تختار الوحدة الصح بالسعر ونظام السداد اللي يناسبك.')}</p>
             </div>
             <div className="footer-cta-actions">
-              {phone ? <a className="btn footer-btn-light" href={telLink(phone)}><FootIcon name="phone" />اتصل بنا</a> : null}
-              {waHref ? <a className="btn footer-btn-wa" href={waHref} target="_blank" rel="noreferrer"><FootIcon name="whatsapp" />واتساب</a> : null}
+              {phone ? <a className="btn footer-btn-light" href={telLink(phone)}><FootIcon name="phone" />{t('اتصل بنا')}</a> : null}
+              {waHref ? <a className="btn footer-btn-wa" href={waHref} target="_blank" rel="noreferrer"><FootIcon name="whatsapp" />{t('واتساب')}</a> : null}
             </div>
           </div>
         </div>
       ) : null}
       <div className="container footer-grid">
         <div className="footer-brand">
-          <Link to="/" aria-label="بلو هوم"><Logo /></Link>
-          <p>شقق وفلل وأراضٍ ومحلات للبيع{areaNames ? ` في ${areaNames}` : ''}، بأسعار واضحة ونظام سداد يناسبك.</p>
+          <Link to="/" aria-label={t('بلو هوم')}><Logo /></Link>
+          {lang === 'en'
+            ? <p>Apartments, villas, lands and shops for sale{areaNames ? ` in ${areaNames}` : ''}, with clear prices and a payment plan that suits you.</p>
+            : <p>شقق وفلل وأراضٍ ومحلات للبيع{areaNames ? ` في ${areaNames}` : ''}، بأسعار واضحة ونظام سداد يناسبك.</p>}
           {social.length ? (
             <div className="footer-social">
               {social.map(([key, label]) => <a key={key} href={settings[key]} target="_blank" rel="noreferrer" aria-label={label} title={label}><FootIcon name={key} /></a>)}
             </div>
           ) : null}
         </div>
-        <nav className="footer-col" aria-label="روابط سريعة">
-          <strong>روابط سريعة</strong>
-          <Link to="/properties">العقارات</Link>
-          <Link to="/units">الوحدات</Link>
-          <Link to="/lands">الأراضي</Link>
-          <Link to="/search?offers=1">العروض</Link>
-          <Link to="/search">بحث متقدم</Link>
+        <nav className="footer-col" aria-label={t('روابط سريعة')}>
+          <strong>{t('روابط سريعة')}</strong>
+          <Link to="/properties">{t('العقارات')}</Link>
+          <Link to="/units">{t('الوحدات')}</Link>
+          <Link to="/lands">{t('الأراضي')}</Link>
+          <Link to="/search?offers=1">{t('العروض')}</Link>
+          <Link to="/search">{t('بحث متقدم')}</Link>
         </nav>
-        <nav className="footer-col" aria-label="الشركة">
-          <strong>الشركة</strong>
-          <Link to="/about">من نحن</Link>
-          <Link to="/contact">تواصل معنا</Link>
-          <Link to="/signup">إنشاء حساب</Link>
-          <Link to="/login">تسجيل الدخول</Link>
+        <nav className="footer-col" aria-label={t('الشركة')}>
+          <strong>{t('الشركة')}</strong>
+          <Link to="/about">{t('من نحن')}</Link>
+          <Link to="/contact">{t('تواصل معنا')}</Link>
+          <Link to="/signup">{t('إنشاء حساب')}</Link>
+          <Link to="/login">{t('تسجيل الدخول')}</Link>
         </nav>
         {areas.length ? (
-          <nav className="footer-col footer-areas" aria-label="المناطق">
-            <strong>المناطق</strong>
+          <nav className="footer-col footer-areas" aria-label={t('المناطق')}>
+            <strong>{t('المناطق')}</strong>
             {areas.map((area) => <Link key={area.id} to={`/search?areaId=${area.id}`}>{area.name}</Link>)}
           </nav>
         ) : null}
         {phone || waHref || settings.email || settings.address ? <div className="footer-col footer-contact">
-          <strong>تواصل معنا</strong>
+          <strong>{t('تواصل معنا')}</strong>
           {phone ? <a href={telLink(phone)}><FootIcon name="phone" /><bdi dir="ltr">{phone}</bdi></a> : null}
-          {waHref ? <a href={waHref} target="_blank" rel="noreferrer"><FootIcon name="whatsapp" />واتساب</a> : null}
+          {waHref ? <a href={waHref} target="_blank" rel="noreferrer"><FootIcon name="whatsapp" />{t('واتساب')}</a> : null}
           {settings.email ? <a href={`mailto:${settings.email}`}><FootIcon name="mail" /><bdi dir="ltr">{settings.email}</bdi></a> : null}
           {settings.address ? <span><FootIcon name="pin" />{settings.address}</span> : null}
         </div> : null}
       </div>
       <div className="footer-bottom">
         <div className="container">
-          <span>© {year} بلو هوم <span lang="en">Blue Home</span>. جميع الحقوق محفوظة.</span>
+          <span>© {year} {lang === 'en' ? 'Blue Home' : <>بلو هوم <span lang="en">Blue Home</span></>}. {t('جميع الحقوق محفوظة.')}</span>
           <span lang="en" dir="ltr">bluehome7.store</span>
         </div>
       </div>
@@ -153,6 +159,7 @@ function Footer({ site }) {
 }
 
 export function PublicLayout() {
+  const { t } = useLang()
   const [site, setSite] = useState(null)
   const [open, setOpen] = useState(false)
   const path = useLocation().pathname
@@ -168,12 +175,12 @@ export function PublicLayout() {
   return (
     <>
       <Header open={open} setOpen={setOpen} />
-      {open ? <button type="button" className="nav-backdrop" aria-label="إغلاق القائمة" onClick={() => setOpen(false)} /> : null}
+      {open ? <button type="button" className="nav-backdrop" aria-label={t('إغلاق القائمة')} onClick={() => setOpen(false)} /> : null}
       <main><Outlet context={site} /></main>
       <Footer site={site} />
       <PriceNotice />
       <InstallPrompt />
-      {whatsapp ? <a className="wa-float" href={waLink(whatsapp, 'مرحباً، أود الاستفسار عن عروض بلو هوم.')} target="_blank" rel="noreferrer">واتساب</a> : null}
+      {whatsapp ? <a className="wa-float" href={waLink(whatsapp, t('مرحباً، أود الاستفسار عن عروض بلو هوم.'))} target="_blank" rel="noreferrer">{t('واتساب')}</a> : null}
     </>
   )
 }

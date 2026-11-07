@@ -1,12 +1,16 @@
 import { useEffect } from 'react'
+import { useLang } from './i18n'
 import { labelOf, OPERATIONS, PAYMENTS, STATUSES, REQUEST_TYPES } from '../shared/constants.js'
 
 export const SITE_TITLE = 'بلو هوم | شقق وفلل وأراضي ومحلات للبيع في 6 أكتوبر وحدائق أكتوبر والشيخ زايد'
 
+export const SITE_TITLE_EN = 'Blue Home | Apartments, villas, lands and shops for sale in 6th of October and Sheikh Zayed'
+
 export function useTitle(title) {
+  const { lang, t } = useLang()
   useEffect(() => {
-    document.title = title ? `${title} | بلو هوم` : SITE_TITLE
-  }, [title])
+    document.title = title ? `${t(title)} | ${t('بلو هوم')}` : lang === 'en' ? SITE_TITLE_EN : SITE_TITLE
+  }, [title, lang])
 }
 
 // Each page tells search engines its own address; otherwise every page claims to be the home page.
@@ -28,11 +32,11 @@ export function formatNumber(value) {
   return new Intl.NumberFormat('en-EG', { maximumFractionDigits: 0 }).format(Number(value))
 }
 
-export function formatDate(iso) {
+export function formatDate(iso, locale = 'ar-EG') {
   if (!iso) return ''
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return ''
-  return new Intl.DateTimeFormat('ar-EG', { dateStyle: 'medium', numberingSystem: 'latn' }).format(date)
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', numberingSystem: 'latn' }).format(date)
 }
 
 export const operationLabel = (id) => labelOf(OPERATIONS, id)

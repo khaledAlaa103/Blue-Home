@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react'
 import { api } from '../api'
 import { bannerStyle } from '../banners'
 import { InquiryForm } from '../components/InquiryForm'
+import { useLang } from '../i18n'
 import { contactNumbers, telLink, useTitle, waLink } from '../format'
-
-const WA_MESSAGE = 'مرحباً، أود الاستفسار عن عروض بلو هوم.'
 
 function Icon({ name }) {
   const paths = {
@@ -38,6 +37,8 @@ function Row({ icon, label, href, external, children }) {
 
 export default function Contact() {
   useTitle('تواصل معنا')
+  const { t } = useLang()
+  const WA_MESSAGE = t('مرحباً، أود الاستفسار عن عروض بلو هوم.')
   const [settings, setSettings] = useState(null)
   useEffect(() => { api.bootstrap().then((data) => setSettings(data.settings)).catch(() => {}) }, [])
   const { phone, whatsapp } = contactNumbers(settings)
@@ -46,27 +47,27 @@ export default function Contact() {
   const hasDetails = phone || (whatsapp && whatsapp !== phone) || email || address
   return (
     <div className="container">
-      <header className="page-head page-banner" style={bannerStyle('contact')}><h1>تواصل معنا</h1></header>
+      <header className="page-head page-banner" style={bannerStyle('contact')}><h1>{t('تواصل معنا')}</h1></header>
       <div className="contact-grid">
         <section className="panel contact-card">
-          <h2>بيانات التواصل</h2>
+          <h2>{t('بيانات التواصل')}</h2>
           {phone || whatsapp ? (
             <div className="contact-actions">
-              {phone ? <a className="btn btn-primary btn-lg" href={telLink(phone)}><Icon name="phone" />اتصل بنا</a> : null}
-              {whatsapp ? <a className="btn btn-wa btn-lg" href={waLink(whatsapp, WA_MESSAGE)} target="_blank" rel="noreferrer"><Icon name="whatsapp" />واتساب</a> : null}
+              {phone ? <a className="btn btn-primary btn-lg" href={telLink(phone)}><Icon name="phone" />{t('اتصل بنا')}</a> : null}
+              {whatsapp ? <a className="btn btn-wa btn-lg" href={waLink(whatsapp, WA_MESSAGE)} target="_blank" rel="noreferrer"><Icon name="whatsapp" />{t('واتساب')}</a> : null}
             </div>
           ) : null}
           {hasDetails ? (
             <ul className="contact-list">
-              {phone ? <Row icon="phone" label="الهاتف" href={telLink(phone)}><bdi dir="ltr">{phone}</bdi></Row> : null}
-              {whatsapp && whatsapp !== phone ? <Row icon="whatsapp" label="واتساب" href={waLink(whatsapp, WA_MESSAGE)} external><bdi dir="ltr">{whatsapp}</bdi></Row> : null}
-              {email ? <Row icon="mail" label="البريد الإلكتروني" href={`mailto:${email}`}><bdi dir="ltr">{email}</bdi></Row> : null}
-              {address ? <Row icon="pin" label="العنوان">{address}</Row> : null}
+              {phone ? <Row icon="phone" label={t('الهاتف')} href={telLink(phone)}><bdi dir="ltr">{phone}</bdi></Row> : null}
+              {whatsapp && whatsapp !== phone ? <Row icon="whatsapp" label={t('واتساب')} href={waLink(whatsapp, WA_MESSAGE)} external><bdi dir="ltr">{whatsapp}</bdi></Row> : null}
+              {email ? <Row icon="mail" label={t('البريد الإلكتروني')} href={`mailto:${email}`}><bdi dir="ltr">{email}</bdi></Row> : null}
+              {address ? <Row icon="pin" label={t('العنوان')}>{address}</Row> : null}
             </ul>
           ) : null}
         </section>
         <section className="panel contact-card">
-          <h2>أرسل رسالة</h2>
+          <h2>{t('أرسل رسالة')}</h2>
           <InquiryForm allowViewing={false} />
         </section>
       </div>

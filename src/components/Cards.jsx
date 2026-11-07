@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { directVideo, formatNumber, formatPrice, statusLabel, videoEmbed } from '../format'
 import { starsLabel } from '../../shared/constants.js'
 import { Price } from './PriceGate'
+import { useLang } from '../i18n'
 
 const ICONS = {
   land: <><path d="M3 20h18" /><path d="M5 20l3-6h8l3 6" /><path d="M9.5 14l-1 6M14.5 14l1 6" /><path d="M12 3a3 3 0 0 1 3 3c0 2.2-3 5-3 5s-3-2.8-3-5a3 3 0 0 1 3-3Z" /><circle cx="12" cy="6" r="1" /></>,
@@ -22,14 +23,15 @@ function iconOf(type) {
 
 // Branded stand-in for a listing with no photo or video, so it still looks finished.
 export function NoPhoto({ type, label, large = false }) {
+  const { t } = useLang()
   return (
-    <div className={large ? 'ph ph-brand large' : 'ph ph-brand'} role="img" aria-label={label || type || 'بلو هوم'}>
+    <div className={large ? 'ph ph-brand large' : 'ph ph-brand'} role="img" aria-label={label || (type ? t(type) : t('بلو هوم'))}>
       <span className="ph-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{iconOf(type)}</svg>
       </span>
-      {type ? <strong className="ph-type">{type}</strong> : null}
+      {type ? <strong className="ph-type">{t(type)}</strong> : null}
       <span className="ph-brand-name" lang="en">BLUE HOME</span>
-      {large ? <span className="ph-note">تواصل معنا وهنبعتلك صور وفيديو العقار</span> : null}
+      {large ? <span className="ph-note">{t('تواصل معنا وهنبعتلك صور وفيديو العقار')}</span> : null}
     </div>
   )
 }
@@ -74,29 +76,30 @@ function countLabel(count, one, few) {
 }
 
 export function ListingCard({ item }) {
+  const { t } = useLang()
   const photo = item.images?.[0]
   return (
     <article className="card">
       <Link to={`/property/${item.id}`} className="card-media">
         {!photo && item.videoUrl ? <VideoCover url={item.videoUrl} alt={item.title} type={item.type} /> : <Cover src={photo} alt={item.title} type={item.type} whole />}
-        <span className={`pill st-${item.status}`}>{statusLabel(item.status)}</span>
+        <span className={`pill st-${item.status}`}>{t(statusLabel(item.status))}</span>
       </Link>
       <div className="card-body">
-        <p className="meta">{item.type} · {item.areaName}</p>
+        <p className="meta">{t(item.type)} · {item.areaName}</p>
         <h3><Link to={`/property/${item.id}`}>{item.title}</Link></h3>
         {item.projectName ? <p className="quiet">{item.projectName}</p> : null}
         <ul className="facts-inline">
-          {item.areaSqm ? <li>{formatNumber(item.areaSqm)} م²</li> : null}
-          {item.floorsCount ? <li>{countLabel(item.floorsCount, 'دور', 'أدوار')}</li> : null}
-          {item.unitsCount ? <li>{countLabel(item.unitsCount, 'وحدة', 'وحدات')}</li> : null}
-          {item.stars ? <li>{starsLabel(item.stars)}</li> : null}
-          {item.hotelRooms ? <li>{countLabel(item.hotelRooms, 'غرفة', 'غرف')}</li> : null}
-          {item.rooms ? <li>{item.rooms} غرف</li> : null}
-          {item.baths ? <li>{item.baths} حمام</li> : null}
+          {item.areaSqm ? <li>{t(`${formatNumber(item.areaSqm)} م²`)}</li> : null}
+          {item.floorsCount ? <li>{t(countLabel(item.floorsCount, 'دور', 'أدوار'))}</li> : null}
+          {item.unitsCount ? <li>{t(countLabel(item.unitsCount, 'وحدة', 'وحدات'))}</li> : null}
+          {item.stars ? <li>{t(starsLabel(item.stars))}</li> : null}
+          {item.hotelRooms ? <li>{t(countLabel(item.hotelRooms, 'غرفة', 'غرف'))}</li> : null}
+          {item.rooms ? <li>{t(`${item.rooms} غرف`)}</li> : null}
+          {item.baths ? <li>{t(`${item.baths} حمام`)}</li> : null}
         </ul>
         <div className="card-foot">
-          {item.price != null ? <Price as="strong" className="price">{formatPrice(item.price)}</Price> : <span className="quiet">السعر غير مُدخل</span>}
-          {item.pricePerMeter != null ? <Price className="ppm" placeholder="00,000 / م²">{formatNumber(item.pricePerMeter)} / م²</Price> : null}
+          {item.price != null ? <Price as="strong" className="price">{t(formatPrice(item.price))}</Price> : <span className="quiet">{t('السعر غير مُدخل')}</span>}
+          {item.pricePerMeter != null ? <Price className="ppm" placeholder="00,000 / م²">{t(`${formatNumber(item.pricePerMeter)} / م²`)}</Price> : null}
         </div>
       </div>
     </article>

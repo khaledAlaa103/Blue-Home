@@ -6,6 +6,7 @@ import { ListingCard } from '../components/Cards'
 import { Filters, FILTER_KEYS } from '../components/Filters'
 import { ResultsMap } from '../components/ResultsMap'
 import { useTitle } from '../format'
+import { useLang } from '../i18n'
 
 function readForm(params) {
   const form = {}
@@ -16,6 +17,7 @@ function readForm(params) {
 
 export default function Listings({ group, title }) {
   useTitle(title)
+  const { t } = useLang()
   const [params, setParams] = useSearchParams()
   const [form, setForm] = useState(() => readForm(params))
   const [meta, setMeta] = useState({ areas: [], projects: [] })
@@ -66,13 +68,13 @@ export default function Listings({ group, title }) {
   return (
     <div className="container">
       <header className="page-head page-banner" style={bannerStyle(group)}>
-        <p className="crumbs">الرئيسية / {title}</p>
-        <h1>{title}</h1>
-        <p className="quiet">{loading ? 'جارٍ التحميل…' : `${data?.total || 0} نتيجة`}</p>
+        <p className="crumbs">{t('الرئيسية')} / {t(title)}</p>
+        <h1>{t(title)}</h1>
+        <p className="quiet">{loading ? t('جارٍ التحميل…') : t(`${data?.total || 0} نتيجة`)}</p>
       </header>
       <div className="tool-row">
-        <button className="filter-toggle" type="button" onClick={() => setFiltersOpen(true)}>تصفية</button>
-        <button className="map-toggle" type="button" onClick={() => setMapOpen(true)}>الخريطة</button>
+        <button className="filter-toggle" type="button" onClick={() => setFiltersOpen(true)}>{t('تصفية')}</button>
+        <button className="map-toggle" type="button" onClick={() => setMapOpen(true)}>{t('الخريطة')}</button>
       </div>
       <div className="results-layout">
         <Filters
@@ -88,27 +90,27 @@ export default function Listings({ group, title }) {
         {!filtersOpen ? null : null}
         <section>
           {group !== 'lands' && group !== 'properties' ? (
-            <div className="chips" aria-label="عدد الغرف">
+            <div className="chips" aria-label={t('عدد الغرف')}>
               {chips.map((chip) => (
-                <button key={chip || 'all'} type="button" className={roomValue === chip ? 'on' : ''} onClick={() => setRoom(chip)}>{chip ? `${chip}+ غرف` : 'كل الغرف'}</button>
+                <button key={chip || 'all'} type="button" className={roomValue === chip ? 'on' : ''} onClick={() => setRoom(chip)}>{chip ? t(`${chip}+ غرف`) : t('كل الغرف')}</button>
               ))}
             </div>
           ) : null}
           {error ? <p className="msg-err">{error}</p> : null}
-          {!loading && !items.length ? <p className="empty">لا توجد نتائج مطابقة. وسّع السعر أو امسح بعض الفلاتر.</p> : null}
+          {!loading && !items.length ? <p className="empty">{t('لا توجد نتائج مطابقة. وسّع السعر أو امسح بعض الفلاتر.')}</p> : null}
           <div className="grid-cards">{items.map((item) => <ListingCard key={item.id} item={item} />)}</div>
           {data && data.pages > 1 ? (
             <div className="pager">
-              <button className="btn btn-line" type="button" disabled={data.page <= 1} onClick={() => pageTo(data.page - 1)}>السابق</button>
-              <span>صفحة {data.page} من {data.pages}</span>
-              <button className="btn btn-line" type="button" disabled={data.page >= data.pages} onClick={() => pageTo(data.page + 1)}>التالي</button>
+              <button className="btn btn-line" type="button" disabled={data.page <= 1} onClick={() => pageTo(data.page - 1)}>{t('السابق')}</button>
+              <span>{t(`صفحة ${data.page} من ${data.pages}`)}</span>
+              <button className="btn btn-line" type="button" disabled={data.page >= data.pages} onClick={() => pageTo(data.page + 1)}>{t('التالي')}</button>
             </div>
           ) : null}
         </section>
         <aside className={mapOpen ? 'map-card map-pane open' : 'map-card map-pane'}>
-          {mapOpen ? <button className="btn btn-line sheet-close" type="button" onClick={() => setMapOpen(false)}>إغلاق الخريطة</button> : null}
+          {mapOpen ? <button className="btn btn-line sheet-close" type="button" onClick={() => setMapOpen(false)}>{t('إغلاق الخريطة')}</button> : null}
           <ResultsMap items={items} active={mapOpen} />
-          {!items.some((item) => item.lat != null) ? <p className="quiet">لا توجد إحداثيات للنتائج الحالية، والخريطة توضح نطاق غرب القاهرة.</p> : null}
+          {!items.some((item) => item.lat != null) ? <p className="quiet">{t('لا توجد إحداثيات للنتائج الحالية، والخريطة توضح نطاق غرب القاهرة.')}</p> : null}
         </aside>
       </div>
     </div>

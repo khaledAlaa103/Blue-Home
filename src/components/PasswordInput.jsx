@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../i18n'
 
 function Eye({ off }) {
   if (off) {
@@ -19,6 +20,7 @@ function Eye({ off }) {
 
 export function PasswordInput({ value, onChange, autoComplete, required }) {
   const [shown, setShown] = useState(false)
+  const { t } = useLang()
   return (
     <span className="password-field">
       <input type={shown ? 'text' : 'password'} value={value} onChange={onChange} autoComplete={autoComplete} required={required} />
@@ -26,7 +28,7 @@ export function PasswordInput({ value, onChange, autoComplete, required }) {
         className="password-toggle"
         type="button"
         aria-pressed={shown}
-        aria-label={shown ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+        aria-label={shown ? t('إخفاء كلمة المرور') : t('إظهار كلمة المرور')}
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => setShown((current) => !current)}
       >

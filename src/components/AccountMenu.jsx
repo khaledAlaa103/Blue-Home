@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { api, setToken } from '../api'
+import { useLang } from '../i18n'
 
 const ADMIN_LINKS = [
   ['/admin', 'نظرة عامة'],
@@ -23,6 +24,7 @@ function UserIcon() {
 }
 
 export function AccountMenu() {
+  const { t } = useLang()
   const [open, setOpen] = useState(false)
   const [user, setUser] = useState(undefined)
   const box = useRef(null)
@@ -65,11 +67,11 @@ export function AccountMenu() {
     <div className={user ? 'account' : 'account account-guest'} ref={box}>
       {user === null ? (
         <div className="auth-links">
-          <Link to="/login">Login</Link>
-          <Link className="auth-signup" to="/signup">Sign up</Link>
+          <Link to="/login">{t('تسجيل الدخول')}</Link>
+          <Link className="auth-signup" to="/signup">{t('إنشاء حساب')}</Link>
         </div>
       ) : null}
-      <button className="account-btn" type="button" aria-expanded={open} aria-haspopup="menu" aria-label="الحساب" onClick={() => setOpen((value) => !value)}>
+      <button className="account-btn" type="button" aria-expanded={open} aria-haspopup="menu" aria-label={t('الحساب')} onClick={() => setOpen((value) => !value)}>
         <UserIcon />
       </button>
       {open ? (
@@ -77,20 +79,20 @@ export function AccountMenu() {
           {user?.role === 'admin' ? (
             <>
               <p className="account-name">{name}</p>
-              {ADMIN_LINKS.map(([to, label]) => <Link key={to} to={to} role="menuitem">{label}</Link>)}
-              <button type="button" role="menuitem" onClick={logout}>خروج</button>
+              {ADMIN_LINKS.map(([to, label]) => <Link key={to} to={to} role="menuitem">{t(label)}</Link>)}
+              <button type="button" role="menuitem" onClick={logout}>{t('خروج')}</button>
             </>
           ) : null}
           {user && user.role !== 'admin' ? (
             <>
               <p className="account-name">{name}</p>
-              <button type="button" role="menuitem" onClick={logout}>خروج</button>
+              <button type="button" role="menuitem" onClick={logout}>{t('خروج')}</button>
             </>
           ) : null}
           {!user ? (
             <>
-              <Link to="/login" role="menuitem">Login</Link>
-              <Link to="/signup" role="menuitem">Sign up</Link>
+              <Link to="/login" role="menuitem">{t('تسجيل الدخول')}</Link>
+              <Link to="/signup" role="menuitem">{t('إنشاء حساب')}</Link>
             </>
           ) : null}
         </div>
