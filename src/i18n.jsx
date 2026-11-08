@@ -7,6 +7,7 @@ const EN = {
   'بلو هوم': 'Blue Home',
   'إغلاق القائمة': 'Close menu',
   'فتح القائمة': 'Open menu',
+  'القائمة': 'Menu',
   'الرئيسية': 'Home',
   'العقارات': 'Properties',
   'الوحدات': 'Units',

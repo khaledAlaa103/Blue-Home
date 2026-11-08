@@ -46,6 +46,7 @@ function Header({ open, setOpen }) {
         <Link to="/" className="logo-link" aria-label={t('بلو هوم')}><Logo /></Link>
         <button className="nav-toggle" type="button" aria-label={open ? t('إغلاق القائمة') : t('فتح القائمة')} aria-expanded={open} aria-controls="site-nav" onClick={() => setOpen((value) => !value)}>
           <span className="nav-toggle-icon" aria-hidden="true"><span /><span /><span /></span>
+          <span className="nav-toggle-label">{open ? t('إغلاق') : t('القائمة')}</span>
         </button>
         <nav id="site-nav" className={open ? 'nav open' : 'nav'}>
           <NavLink to="/" end>{t('الرئيسية')}</NavLink>

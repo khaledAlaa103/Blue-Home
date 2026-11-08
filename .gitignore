@@ -8,3 +8,5 @@ server/hosts.json
 server/uploads/*
 !server/uploads/.gitkeep
 .dev.vars
+.env
+.env.*

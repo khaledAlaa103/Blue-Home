@@ -1201,4 +1201,36 @@ th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--li
 .lang-toggle:hover { border-color: #1d4ed8; color: #1d4ed8; }
 html[dir="ltr"] .logo strong { text-align: left; }
 html[dir="ltr"] .num { text-align: left; }
-@media (max-width: 860px) { .topbar .lang-toggle { margin-inline-start: auto; } }
+/* Phone header: logo, language, and a big labelled MENU button. Login / Sign up live at the bottom of the menu. */
+@media (max-width: 979px) {
+  .header .auth-links { display: none; }
+  .header .account { margin-inline-start: 0; }
+  .header .topbar .lang-toggle { order: 1; margin-inline-start: auto; height: 46px; min-width: 46px; }
+  .header .nav-toggle {
+    width: auto;
+    min-width: 46px;
+    height: 46px;
+    padding: 0 16px;
+    gap: 10px;
+    grid-auto-flow: column;
+    border: 0;
+    border-radius: 14px;
+    background: var(--blue);
+    color: #fff;
+    font: inherit;
+    font-weight: 800;
+    box-shadow: 0 6px 14px rgba(29, 78, 216, 0.28);
+  }
+  .header .nav-toggle:hover, .header .nav-toggle[aria-expanded="true"] { background: var(--blue-d); border-color: transparent; color: #fff; }
+  .header .nav-toggle-label { font-size: 0.98rem; line-height: 1; }
+  .header .nav-toggle-icon { width: 22px; height: 16px; }
+  .header .nav-toggle-icon span { height: 2.5px; }
+  .header .nav-toggle-icon span:nth-child(2) { top: 6.75px; }
+  .header .nav-toggle-icon span:nth-child(3) { top: 13.5px; }
+  .header .nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(1) { transform: translateY(6.75px) rotate(45deg); }
+  .header .nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(3) { transform: translateY(-6.75px) rotate(-45deg); }
+  .nav-auth { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .nav .nav-auth .btn { justify-content: center; min-height: 48px; }
+  .nav .nav-auth .btn-primary { color: #fff; }
+}
+@media (min-width: 980px) { .nav-toggle-label { display: none; } }
