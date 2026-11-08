@@ -8,6 +8,7 @@ const EN = {
   'إغلاق القائمة': 'Close menu',
   'فتح القائمة': 'Open menu',
   'القائمة': 'Menu',
+  'إنشاء حساب مجاني لعرض الأسعار': 'Sign up free to see prices',
   'الرئيسية': 'Home',
   'العقارات': 'Properties',
   'الوحدات': 'Units',

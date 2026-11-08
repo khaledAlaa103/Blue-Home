@@ -65,6 +65,12 @@ function Header({ open, setOpen }) {
         <LangToggle />
         <AccountMenu />
       </div>
+      {signedIn ? null : (
+        <div className="container mobile-signup">
+          <Link className="btn btn-primary" to="/signup">{t('إنشاء حساب مجاني')}</Link>
+          <Link className="mobile-signup-login" to="/login">{t('تسجيل الدخول')}</Link>
+        </div>
+      )}
     </header>
   )
 }
