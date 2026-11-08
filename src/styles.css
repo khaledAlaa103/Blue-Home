@@ -1205,13 +1205,13 @@ html[dir="ltr"] .num { text-align: left; }
 @media (max-width: 979px) {
   .header .auth-links { display: none; }
   .header .account { margin-inline-start: 0; }
-  .header .topbar .lang-toggle { order: 1; margin-inline-start: auto; height: 46px; min-width: 46px; }
+  .header .topbar .lang-toggle { order: 1; margin-inline-start: auto; height: 38px; min-width: 38px; padding: 0 10px; font-size: 0.82rem; }
   .header .nav-toggle {
     width: auto;
-    min-width: 46px;
-    height: 46px;
-    padding: 0 16px;
-    gap: 10px;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 12px;
+    gap: 8px;
     grid-auto-flow: column;
     border: 0;
     border-radius: 14px;
@@ -1222,19 +1222,22 @@ html[dir="ltr"] .num { text-align: left; }
     box-shadow: 0 6px 14px rgba(29, 78, 216, 0.28);
   }
   .header .nav-toggle:hover, .header .nav-toggle[aria-expanded="true"] { background: var(--blue-d); border-color: transparent; color: #fff; }
-  .header .nav-toggle-label { font-size: 0.98rem; line-height: 1; }
-  .header .nav-toggle-icon { width: 22px; height: 16px; }
-  .header .nav-toggle-icon span { height: 2.5px; }
-  .header .nav-toggle-icon span:nth-child(2) { top: 6.75px; }
-  .header .nav-toggle-icon span:nth-child(3) { top: 13.5px; }
-  .header .nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(1) { transform: translateY(6.75px) rotate(45deg); }
-  .header .nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(3) { transform: translateY(-6.75px) rotate(-45deg); }
+  .header .nav-toggle-label { font-size: 0.85rem; line-height: 1; }
+  .header .nav-toggle-icon { width: 18px; height: 13px; }
+  .header .nav-toggle-icon span { height: 2px; }
+  .header .nav-toggle-icon span:nth-child(2) { top: 5.5px; }
+  .header .nav-toggle-icon span:nth-child(3) { top: 11px; }
+  .header .nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+  .header .nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+  .header .logo-mark { width: 48px; height: 48px; }
+  .header .logo strong { font-size: 1.25rem; }
+  .header .logo small { font-size: 1rem; }
   .nav-auth { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--line); }
   .nav .nav-auth .btn { justify-content: center; min-height: 48px; }
   .nav .nav-auth .btn-primary { color: #fff; }
 }
 @media (min-width: 980px) { .nav-toggle-label, .mobile-signup { display: none; } }
 /* Phone: a clear «Sign up» strip right under the header for visitors who are not signed in. */
-.mobile-signup { display: flex; align-items: center; gap: 10px; padding-block: 8px 10px; }
-.mobile-signup .btn { flex: 1; min-height: 46px; justify-content: center; font-weight: 800; font-size: 1rem; box-shadow: 0 6px 14px rgba(29, 78, 216, 0.25); }
-.mobile-signup-login { flex: none; min-height: 46px; display: inline-flex; align-items: center; padding: 0 14px; border: 1px solid #c9d7f5; border-radius: 12px; background: #f8faff; color: var(--blue-d); font-weight: 800; white-space: nowrap; }
+.mobile-signup { display: flex; align-items: center; gap: 8px; padding-block: 0 8px; }
+.mobile-signup .btn { flex: 1; min-height: 38px; padding-block: 0; justify-content: center; font-weight: 800; font-size: 0.9rem; box-shadow: none; }
+.mobile-signup-login { flex: none; min-height: 38px; font-size: 0.88rem; display: inline-flex; align-items: center; padding: 0 14px; border: 1px solid #c9d7f5; border-radius: 12px; background: #f8faff; color: var(--blue-d); font-weight: 800; white-space: nowrap; }
