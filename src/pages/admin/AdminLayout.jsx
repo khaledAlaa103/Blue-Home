@@ -38,6 +38,7 @@ export default function AdminLayout() {
         {current ? <span className="dash-current">{current}</span> : null}
         <button className="nav-toggle" type="button" aria-label={open ? 'إغلاق القائمة' : 'فتح القائمة'} aria-expanded={open} aria-controls="admin-nav" onClick={() => setOpen((value) => !value)}>
           <span className="nav-toggle-icon" aria-hidden="true"><span /><span /><span /></span>
+          <span className="nav-toggle-label">{open ? 'إغلاق' : 'القائمة'}</span>
         </button>
         <nav id="admin-nav" className={open ? 'pills open' : 'pills'}>
           {LINKS.map(([to, label]) => <NavLink key={to} to={to} end={to === '/admin'}>{label}</NavLink>)}
